@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>welcome</title>
+</head>
+
+<body>
+    <button onclick="signin()">signin</button>
+    <button onclick="signup()">signup</button>
+    <p>userID if cookies exist/empty if not ->_{{ . }}_<- </p>
+</body>
+<script>
+    function signin() {
+        let xhr = new XMLHttpRequest()
+        xhr.open('GET', 'http://localhost:8080/signin')
+        xhr.onload = function () {
+            window.location.replace("/signin")
+        };
+        xhr.send()
+    }
+
+    function signup() {
+        let xhr = new XMLHttpRequest()
+        xhr.open('GET', 'http://localhost:8080/signup')
+        xhr.onload = function () {
+            window.location.replace("/signup")
+        };
+        xhr.send()
+    }
+</script>
+
+</html>

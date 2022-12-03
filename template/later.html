@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>welcome</title>
+</head>
+
+<body>
+    <input type="text" name="email">
+    <input type="text" name="username">
+    <input type="text" name="password">
+    <button onclick="signin()">signin</button>
+    <button onclick="signup()">signup</button>
+</body>
+<script>
+    function signin() {
+        const i = document.querySelectorAll('input')
+        const data = {
+            "username": i[0].value,
+            "password": i[1].value
+        }
+        let xml = new XMLHttpRequest()
+        xml.open('POST', 'http://localhost:8080/signin')
+        xml.onload = function () {
+            window.location.replace("/home")
+        };
+        xml.send(JSON.stringify(data))
+    }
+    function signup() {
+        const i = document.querySelectorAll('input')
+        const data = {
+            "username": i[0].value,
+            "password": i[1].value
+        }
+        let xml = new XMLHttpRequest()
+        xml.open('POST', 'http://localhost:8080/signup')
+        xml.onload = function () {
+            window.location.replace("/")
+        };
+        xml.send(JSON.stringify(data))
+    }
+</script>
+
+</html>
