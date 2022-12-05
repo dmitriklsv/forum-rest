@@ -54,6 +54,29 @@ func (p *postDB) GetPostByID(ctx context.Context, postID uint64) (entity.Post, e
 		return entity.Post{}, err
 	}
 
+	query = `SELECT category_id FROM postcategory WHERE post_id = ?`
+	rows, err := p.storage.Collection.QueryContext(ctx, query, postID)
+	if err != nil {
+		return entity.Post{}, err
+	}
+
+	for rows.Next() {
+		var catID uint64
+		if err := rows.Scan(&catID); err != nil {
+			return entity.Post{}, err
+		}
+
+		query := `SELECT name FROM categories WHERE id = ?`
+		row := p.storage.Collection.QueryRowContext(ctx, query, catID)
+
+		catName := ""
+		if err := row.Scan(&catName); err != nil {
+			return entity.Post{}, err
+		}
+
+		post.Categories = append(post.Categories, catName)
+	}
+
 	return post, nil
 }
 
