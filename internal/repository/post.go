@@ -20,6 +20,43 @@ func NewPostRepo(database *sqlite3.DB) PostRepo {
 	}
 }
 
+func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	query := `SELECT * FROM posts`
+	rows, err := p.storage.Collection.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	posts := []entity.Post{}
+	for rows.Next() {
+		post := &entity.Post{}
+		if err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
+			return nil, err
+		}
+		posts = append(posts, *post)
+	}
+
+	return posts, nil
+}
+
+func (p *postDB) GetPostByID(ctx context.Context, postID uint64) (entity.Post, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	query := `SELECT * FROM posts WHERE id = ?`
+	row := p.storage.Collection.QueryRowContext(ctx, query, postID)
+
+	post := entity.Post{}
+	if err := row.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
+		return entity.Post{}, err
+	}
+
+	return post, nil
+}
+
 func (p *postDB) CreatePost(ctx context.Context, post entity.Post) (int64, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()

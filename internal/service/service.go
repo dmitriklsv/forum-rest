@@ -16,6 +16,8 @@ type Authentication interface {
 }
 
 type PostService interface {
+	GetAllPosts(ctx context.Context) ([]entity.Post, error)
+	GetPostByID(ctx context.Context, postID uint64) (entity.Post, error)
 	CreatePost(ctx context.Context, post entity.Post) (int64, error)
 }
 

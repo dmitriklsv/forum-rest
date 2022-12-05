@@ -19,9 +19,9 @@ type UserHandler interface {
 }
 
 type PostHandler interface {
-	CreatePost(w http.ResponseWriter, r *http.Request)
-	// GetPostByID()
 	GetAllPosts(w http.ResponseWriter, r *http.Request)
+	CreatePost(w http.ResponseWriter, r *http.Request)
+	GetPostByID(w http.ResponseWriter, r *http.Request)
 	// GetAllPostsByCategoryID()
 }
 

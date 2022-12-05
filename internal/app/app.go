@@ -17,6 +17,7 @@ const (
 	createPost    = "/create_post"
 	createComment = "/create_comment"
 	getAllPosts   = "/get_all_posts"
+	getPostByID   = "/get_post_by_id"
 )
 
 func Run(handlers *controller.Handlers) error {
@@ -28,10 +29,11 @@ func Run(handlers *controller.Handlers) error {
 	router.HandleFunc(signin, handlers.SignIn)
 
 	// home
+	router.HandleFunc(getAllPosts, handlers.GetAllPosts)
+	router.HandleFunc(getPostByID, handlers.GetPostByID)
 	router.Handle(welcome, handlers.Middleware(handlers.WelcomePage))
 	// router.Handle(home, handlers.Middleware(handlers.HomePage))
 	router.Handle(createPost, handlers.Middleware(handlers.CreatePost))
-	// router.Handle(getAllPosts,handlers.)
 	router.Handle(createComment, handlers.Middleware(handlers.CreateComment))
 
 	return ListenAndServe(router)
