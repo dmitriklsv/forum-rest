@@ -31,6 +31,7 @@ type CategoryHandler interface {
 
 type CommentHandler interface {
 	CreateComment(w http.ResponseWriter, r *http.Request)
+	GetCommentByID(w http.ResponseWriter, r *http.Request)
 }
 
 type Handlers struct {

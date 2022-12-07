@@ -39,3 +39,18 @@ func (c *commentDB) CreateComment(ctx context.Context, comment entity.Comment) (
 
 	return res.LastInsertId()
 }
+
+func (c *commentDB) GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+
+	query := `SELECT * FROM comments WHERE id = ?`
+	row := c.storage.QueryRowContext(ctx, query, commentID)
+
+	var comment entity.Comment
+	if err := row.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Text); err != nil {
+		return entity.Comment{}, err
+	}
+
+	return comment, nil
+}

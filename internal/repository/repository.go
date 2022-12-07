@@ -35,6 +35,7 @@ type CategoryRepo interface {
 
 type CommentRepo interface {
 	CreateComment(ctx context.Context, comment entity.Comment) (int64, error)
+	GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error)
 }
 
 type Repositories struct {

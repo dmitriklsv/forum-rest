@@ -38,8 +38,6 @@ func (c *commentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fmt.Println(comment)
-
 	commentID, err := c.service.CreateComment(r.Context(), comment)
 	if err != nil {
 		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
@@ -47,6 +45,31 @@ func (c *commentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(commentID); err != nil {
+		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		return
+	}
+}
+
+func (c *commentHandler) GetCommentByID(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	defer r.Body.Close()
+
+	var comment entity.Comment
+	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
+		http.Error(w, errors.Bruhhh, http.StatusBadRequest)
+		return
+	}
+
+	comment, err := c.service.GetCommentByID(r.Context(), comment.ID)
+	if err != nil {
+		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(comment); err != nil {
 		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
 		return
 	}

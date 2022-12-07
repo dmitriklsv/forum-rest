@@ -22,3 +22,7 @@ func NewCommentService(cRepo repository.CommentRepo) CommentService {
 func (c *commentService) CreateComment(ctx context.Context, comment entity.Comment) (int64, error) {
 	return c.commentRepo.CreateComment(ctx, comment)
 }
+
+func (c *commentService) GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error) {
+	return c.commentRepo.GetCommentByID(ctx, commentID)
+}

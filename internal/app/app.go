@@ -19,11 +19,11 @@ const (
 	getAllPosts = "/get_all_posts"
 	getPostByID = "/get_post_by_id"
 	// category
-	// createCategory   = "/create_category"
 	getAllCategories = "/get_all_categories"
 	getCategoryByID  = "/get_category_by_id"
 	// comment
-	createComment = "/create_comment"
+	createComment  = "/create_comment"
+	getCommentByID = "/get_comment_by_id"
 )
 
 func Run(handlers *controller.Handlers) error {
@@ -40,12 +40,12 @@ func Run(handlers *controller.Handlers) error {
 	router.HandleFunc(getPostByID, handlers.GetPostByID)
 
 	// cat
-	// router.Handle(createCategory, handlers.Middleware(handlers.CreateCategory))
 	router.HandleFunc(getAllCategories, handlers.GetAllCategories)
 	router.HandleFunc(getCategoryByID, handlers.GetCategoryByID)
 
 	// comment
 	router.Handle(createComment, handlers.Middleware(handlers.CreateComment))
+	router.HandleFunc(getCommentByID, handlers.GetCommentByID)
 
 	// home
 	router.Handle(welcome, handlers.Middleware(handlers.WelcomePage))
