@@ -60,9 +60,8 @@ func (h *welcomeHandler) Middleware(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		sessionToken := c.Value
 
-		session, err := h.service.GetSession(r.Context(), sessionToken)
+		session, err := h.service.GetSession(r.Context(), c.Value)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return

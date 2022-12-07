@@ -32,7 +32,7 @@ func (a *authService) GetUser(ctx context.Context, id uint64) (entity.User, erro
 	return a.userRepo.FindByID(ctx, id)
 }
 
-func (a *authService) SetUser(ctx context.Context, user entity.User) (int64, error) {
+func (a *authService) CreateUser(ctx context.Context, user entity.User) (int64, error) {
 	foundUser, _ := a.userRepo.FindOne(ctx, entity.User{
 		Email:    user.Email,
 		Username: user.Username,
@@ -51,7 +51,6 @@ func (a *authService) SetUser(ctx context.Context, user entity.User) (int64, err
 }
 
 func (a *authService) UpdateSession(ctx context.Context, session entity.Session) (entity.Session, error) {
-	s := entity.Session{}
 	s, err := generateSession(session.UserID)
 	if err != nil {
 		return entity.Session{}, err

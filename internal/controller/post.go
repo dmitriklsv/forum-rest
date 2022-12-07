@@ -43,8 +43,9 @@ func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
-	post := entity.Post{}
+	var post entity.Post
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -67,6 +68,7 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	userID := r.Context().Value(userCtx)
 	post := entity.Post{
@@ -78,15 +80,13 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// fmt.Println(post)
-
 	postID, err := p.service.CreatePost(r.Context(), post)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(postID); err != nil {
+	if err = json.NewEncoder(w).Encode(postID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

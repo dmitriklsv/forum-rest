@@ -12,12 +12,15 @@ import (
 const (
 	welcome = "/"
 	// home       = "/home"
-	signup        = "/signup"
-	signin        = "/signin"
-	createPost    = "/create_post"
-	createComment = "/create_comment"
-	getAllPosts   = "/get_all_posts"
-	getPostByID   = "/get_post_by_id"
+	signup           = "/signup"
+	signin           = "/signin"
+	createPost       = "/create_post"
+	getAllPosts      = "/get_all_posts"
+	getPostByID      = "/get_post_by_id"
+	createCategory   = "/create_category"
+	getAllCategories = "/get_all_categories"
+	getCategoryByID  = "/get_category_by_id"
+	createComment    = "/create_comment"
 )
 
 func Run(handlers *controller.Handlers) error {
@@ -28,13 +31,22 @@ func Run(handlers *controller.Handlers) error {
 	router.HandleFunc(signup, handlers.SignUp)
 	router.HandleFunc(signin, handlers.SignIn)
 
-	// home
+	// post
+	router.Handle(createPost, handlers.Middleware(handlers.CreatePost))
 	router.HandleFunc(getAllPosts, handlers.GetAllPosts)
 	router.HandleFunc(getPostByID, handlers.GetPostByID)
+
+	// cat
+	router.Handle(createCategory, handlers.Middleware(handlers.CreateCategory))
+	// router.HandleFunc(getAllCategories, handlers.GetAllCategories)
+	// router.HandleFunc(getCategoryByID, handlers.GetCategoryByID)
+
+	// comment
+	router.Handle(createComment, handlers.Middleware(handlers.CreateComment))
+
+	// home
 	router.Handle(welcome, handlers.Middleware(handlers.WelcomePage))
 	// router.Handle(home, handlers.Middleware(handlers.HomePage))
-	router.Handle(createPost, handlers.Middleware(handlers.CreatePost))
-	router.Handle(createComment, handlers.Middleware(handlers.CreateComment))
 
 	return ListenAndServe(router)
 }

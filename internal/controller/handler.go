@@ -25,6 +25,10 @@ type PostHandler interface {
 	// GetAllPostsByCategoryID()
 }
 
+type CategoryHandler interface {
+	CreateCategory(w http.ResponseWriter, r *http.Request)
+}
+
 type CommentHandler interface {
 	CreateComment(w http.ResponseWriter, r *http.Request)
 }
@@ -33,14 +37,16 @@ type Handlers struct {
 	Welcomer
 	UserHandler
 	PostHandler
+	CategoryHandler
 	CommentHandler
 }
 
 func NewHandlers(services *service.Services) *Handlers {
 	return &Handlers{
-		Welcomer:       NewWelcomeHandler(services.Authentication),
-		UserHandler:    NewUserHandler(services.Authentication),
-		PostHandler:    NewPostHandler(services.PostService),
-		CommentHandler: NewCommentHandler(services.CommentService),
+		Welcomer:        NewWelcomeHandler(services.Authentication),
+		UserHandler:     NewUserHandler(services.Authentication),
+		PostHandler:     NewPostHandler(services.PostService),
+		CategoryHandler: NewCategoryHandler(services.CategoryService),
+		CommentHandler:  NewCommentHandler(services.CommentService),
 	}
 }

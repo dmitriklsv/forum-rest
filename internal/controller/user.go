@@ -21,13 +21,15 @@ func NewUserHandler(service service.Authentication) UserHandler {
 }
 
 func (h *userHandler) SignIn(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
 	switch r.Method {
 	// case http.MethodGet:
 	// 	tmpl, _ := template.ParseFiles("./template/signin.html")
 	// 	tmpl.Execute(w, nil)
 	// 	return
 	case http.MethodPost:
-		user := entity.User{}
+		var user entity.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -54,19 +56,21 @@ func (h *userHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *userHandler) SignUp(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
 	switch r.Method {
 	// case http.MethodGet:
 	// 	tmpl, _ := template.ParseFiles("./template/signup.html")
 	// 	tmpl.Execute(w, nil)
 	// 	return
 	case http.MethodPost:
-		user := entity.User{}
+		var user entity.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
-		_, err := h.service.SetUser(r.Context(), user)
+		_, err := h.service.CreateUser(r.Context(), user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

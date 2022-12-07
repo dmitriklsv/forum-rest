@@ -34,15 +34,17 @@ const (
 
 	categories_table = `CREATE TABLE IF NOT EXISTS categories (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-		"name" TEXT UNIQUE
+		"post_id" INTEGER,
+		"name" TEXT UNIQUE,
+		FOREIGN KEY (post_id) REFERENCES posts (id)
 	);`
 
-	postcategory_table = `CREATE TABLE IF NOT EXISTS postcategory (
-		"post_id" INTEGER,
-		"category_id" INTEGER,
-		FOREIGN KEY (post_id) REFERENCES posts (id),
-		FOREIGN KEY (category_id) REFERENCES categories (id)
-	);`
+	// postcategory_table = `CREATE TABLE IF NOT EXISTS postcategory (
+	// 	"post_id" INTEGER,
+	// 	"category_id" INTEGER,
+	// 	FOREIGN KEY (post_id) REFERENCES posts (id),
+	// 	FOREIGN KEY (category_id) REFERENCES categories (id)
+	// );`
 
 	comment_table = `CREATE TABLE IF NOT EXISTS comments (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -60,11 +62,10 @@ type DB struct {
 
 func Connect() (*DB, error) {
 	log.Println("| | opening database...")
-	db, err := sql.Open("sqlite3", "file:./internal/repository/database/database.db?_auth&_auth_user=admin&_auth_pass=admin&_auth_crypt=sha1")
+	db, err := sql.Open("sqlite3", "file:./database/database.db?_auth&_auth_user=admin&_auth_pass=admin&_auth_crypt=sha1")
 	if err != nil {
 		return nil, fmt.Errorf("couldn't open database due to %v", err)
 	}
-
 	log.Println("| | preparing database tables...")
 	if _, err := prepareTables(db); err != nil {
 		return nil, err
@@ -79,7 +80,7 @@ func Connect() (*DB, error) {
 func prepareTables(db *sql.DB) (sql.Result, error) {
 	log.Println("| | | checking database for existing tables...")
 
-	arr := []string{users_table, sessions_table, posts_table, categories_table, postcategory_table, comment_table}
+	arr := []string{users_table, sessions_table, posts_table, categories_table /* postcategory_table, */, comment_table}
 
 	for i := 0; i < len(arr); i++ {
 		st, err := db.Prepare(arr[i])

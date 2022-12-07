@@ -26,6 +26,10 @@ type PostRepo interface {
 	CreatePost(ctx context.Context, post entity.Post) (int64, error)
 }
 
+type CategoryRepo interface {
+	CreateCategory(ctx context.Context, categories []entity.Category) ([]int64, error)
+}
+
 type CommentRepo interface {
 	CreateComment(ctx context.Context, comment entity.Comment) (int64, error)
 }
@@ -34,14 +38,16 @@ type Repositories struct {
 	UserRepo
 	SessionRepo
 	PostRepo
+	CategoryRepo
 	CommentRepo
 }
 
 func NewRepos(db *sqlite3.DB) *Repositories {
 	return &Repositories{
-		UserRepo:    NewUserRepo(db),
-		SessionRepo: NewSessionRepo(db),
-		PostRepo:    NewPostRepo(db),
-		CommentRepo: NewCommentRepo(db),
+		UserRepo:     NewUserRepo(db),
+		SessionRepo:  NewSessionRepo(db),
+		PostRepo:     NewPostRepo(db),
+		CategoryRepo: NewCategoryRepo(db),
+		CommentRepo:  NewCommentRepo(db),
 	}
 }

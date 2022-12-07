@@ -2,32 +2,33 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"log"
-	"time"
 
 	"forum/internal/entity"
+	"forum/internal/tool/config"
 	"forum/pkg/sqlite3"
 )
 
 type sessionDB struct {
-	storage *sqlite3.DB
+	storage *sql.DB
 }
 
 func NewSessionRepo(database *sqlite3.DB) SessionRepo {
 	log.Println("| | session repository is done!")
 	return &sessionDB{
-		storage: database,
+		storage: database.Collection,
 	}
 }
 
 func (d *sessionDB) GetSession(ctx context.Context, sessionToken string) (entity.Session, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
 	query := `SELECT * FROM sessions WHERE session_token = ?`
-	row := d.storage.Collection.QueryRowContext(ctx, query, sessionToken)
+	row := d.storage.QueryRowContext(ctx, query, sessionToken)
 
-	session := entity.Session{}
+	var session entity.Session
 	if err := row.Scan(&session.ID, &session.UserID, &session.Token, &session.ExpireTime); err != nil {
 		return entity.Session{}, err
 	}
@@ -36,11 +37,11 @@ func (d *sessionDB) GetSession(ctx context.Context, sessionToken string) (entity
 }
 
 func (d *sessionDB) CreateSession(ctx context.Context, session entity.Session) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
 	query := `INSERT INTO sessions (user_id, session_token, expire_time) VALUES (?, ?, ?)`
-	st, err := d.storage.Collection.PrepareContext(ctx, query)
+	st, err := d.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return err
 	}
@@ -54,12 +55,12 @@ func (d *sessionDB) CreateSession(ctx context.Context, session entity.Session) e
 }
 
 func (d *sessionDB) UpdateSession(ctx context.Context, session entity.Session) (entity.Session, error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
 	// fmt.Println(session)
 	query := `UPDATE sessions SET session_token = ?, expire_time = ? WHERE user_id = ?`
-	st, err := d.storage.Collection.PrepareContext(ctx, query)
+	st, err := d.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return session, err
 	}
@@ -73,11 +74,11 @@ func (d *sessionDB) UpdateSession(ctx context.Context, session entity.Session) (
 }
 
 func (d *sessionDB) DeleteSession(ctx context.Context, id uint64) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
 	query := `DELETE FROM sessions WHERE user_id = ?`
-	st, err := d.storage.Collection.PrepareContext(ctx, query)
+	st, err := d.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return err
 	}

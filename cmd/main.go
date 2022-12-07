@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"forum/internal/app"
@@ -14,7 +15,8 @@ func main() {
 	log.Println("| connecting database...")
 	db, err := sqlite3.Connect()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 	log.Println("| database connected!")
 	defer db.Collection.Close()
@@ -32,6 +34,7 @@ func main() {
 	log.Println("| handlers are ready to work!")
 
 	if err := app.Run(handlers); err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 }
