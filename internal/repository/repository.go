@@ -27,9 +27,10 @@ type PostRepo interface {
 }
 
 type CategoryRepo interface {
-	CreateCategory(ctx context.Context, categories []entity.Category) ([]int64, error)
+	CreateCategory(ctx context.Context, postID uint64, categories []entity.Category) /* []int64,  */ error
 	GetAllCategories(ctx context.Context) ([]entity.Category, error)
 	GetCategoryByID(ctx context.Context, categoryID uint64) (entity.Category, error)
+	GetCategoriesByPostID(ctx context.Context, postID uint64) ([]entity.Category, error)
 }
 
 type CommentRepo interface {

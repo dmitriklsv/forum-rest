@@ -19,10 +19,6 @@ func NewCategoryService(catRepo repository.CategoryRepo) CategoryService {
 	}
 }
 
-func (c *categoryService) CreateCategory(ctx context.Context, categories []entity.Category) ([]int64, error) {
-	return c.catRepo.CreateCategory(ctx, categories)
-}
-
 func (c *categoryService) GetAllCategories(ctx context.Context) ([]entity.Category, error) {
 	return c.catRepo.GetAllCategories(ctx)
 }

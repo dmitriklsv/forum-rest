@@ -35,7 +35,7 @@ const (
 	categories_table = `CREATE TABLE IF NOT EXISTS categories (
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"post_id" INTEGER,
-		"name" TEXT UNIQUE,
+		"name" TEXT,
 		FOREIGN KEY (post_id) REFERENCES posts (id)
 	);`
 

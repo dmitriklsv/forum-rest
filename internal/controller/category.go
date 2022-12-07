@@ -21,28 +21,6 @@ func NewCategoryHandler(service service.CategoryService) CategoryHandler {
 	}
 }
 
-func (c *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-	defer r.Body.Close()
-
-	var categories []entity.Category
-	if err := json.NewDecoder(r.Body).Decode(&categories); err != nil {
-		http.Error(w, errors.InvalidData, http.StatusBadRequest)
-		return
-	}
-
-	catIDs, err := c.service.CreateCategory(r.Context(), categories)
-	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(catIDs)
-}
-
 func (c *categoryHandler) GetAllCategories(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)

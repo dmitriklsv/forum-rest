@@ -25,7 +25,6 @@ type PostHandler interface {
 }
 
 type CategoryHandler interface {
-	CreateCategory(w http.ResponseWriter, r *http.Request)
 	GetAllCategories(w http.ResponseWriter, r *http.Request)
 	GetCategoryByID(w http.ResponseWriter, r *http.Request)
 }

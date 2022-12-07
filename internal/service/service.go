@@ -22,7 +22,6 @@ type PostService interface {
 }
 
 type CategoryService interface {
-	CreateCategory(ctx context.Context, categories []entity.Category) ([]int64, error)
 	GetAllCategories(ctx context.Context) ([]entity.Category, error)
 	GetCategoryByID(ctx context.Context, categoryID uint64) (entity.Category, error)
 }
@@ -41,7 +40,7 @@ type Services struct {
 func NewServices(repository *repository.Repositories) *Services {
 	return &Services{
 		Authentication:  NewAuthService(repository.UserRepo, repository.SessionRepo),
-		PostService:     NewPostService(repository.PostRepo),
+		PostService:     NewPostService(repository.PostRepo, repository.CategoryRepo),
 		CategoryService: NewCategoryService(repository.CategoryRepo),
 		CommentService:  NewCommentService(repository.CommentRepo),
 	}

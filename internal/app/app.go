@@ -19,7 +19,7 @@ const (
 	getAllPosts = "/get_all_posts"
 	getPostByID = "/get_post_by_id"
 	// category
-	createCategory   = "/create_category"
+	// createCategory   = "/create_category"
 	getAllCategories = "/get_all_categories"
 	getCategoryByID  = "/get_category_by_id"
 	// comment
@@ -40,7 +40,7 @@ func Run(handlers *controller.Handlers) error {
 	router.HandleFunc(getPostByID, handlers.GetPostByID)
 
 	// cat
-	router.Handle(createCategory, handlers.Middleware(handlers.CreateCategory))
+	// router.Handle(createCategory, handlers.Middleware(handlers.CreateCategory))
 	router.HandleFunc(getAllCategories, handlers.GetAllCategories)
 	router.HandleFunc(getCategoryByID, handlers.GetCategoryByID)
 

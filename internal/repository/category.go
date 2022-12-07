@@ -21,34 +21,25 @@ func NewCategoryRepo(database *sqlite3.DB) CategoryRepo {
 	}
 }
 
-func (c *categoryDB) CreateCategory(ctx context.Context, categories []entity.Category) ([]int64, error) {
+func (c *categoryDB) CreateCategory(ctx context.Context, postID uint64, categories []entity.Category) /* []int64, */ error {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	createdCatIDs := make([]int64, len(categories))
-	for i, category := range categories {
+	for _, category := range categories {
 		query := `INSERT INTO categories (post_id, name) VALUES (?, ?)`
 		st, err := c.storage.PrepareContext(ctx, query)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		defer st.Close()
 
-		res, err := st.ExecContext(ctx, category.PostID, category.Name)
-		switch {
-		case err == nil:
-		case err.Error() == "UNIQUE constraint failed: categories.name":
-			createdCatIDs[i] = -1
-			continue
-		default:
-			return nil, err
+		if _, err := st.ExecContext(ctx, postID, category.Name); err != nil {
+			return err
 		}
 
-		id, _ := res.LastInsertId()
-		createdCatIDs[i] = id
 	}
 
-	return createdCatIDs, nil
+	return nil
 }
 
 func (c *categoryDB) GetAllCategories(ctx context.Context) ([]entity.Category, error) {
@@ -87,9 +78,37 @@ func (c *categoryDB) GetCategoryByID(ctx context.Context, categoryID uint64) (en
 	row := c.storage.QueryRowContext(ctx, query, categoryID)
 
 	var category entity.Category
-	if err := row.Scan(&category.ID, &category.ID, &category.Name); err != nil {
+	if err := row.Scan(&category.ID, &category.PostID, &category.Name); err != nil {
 		return entity.Category{}, err
 	}
 
 	return category, nil
+}
+
+func (c *categoryDB) GetCategoriesByPostID(ctx context.Context, postID uint64) ([]entity.Category, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+
+	query := `SELECT * FROM categories WHERE post_id = ?`
+	rows, err := c.storage.QueryContext(ctx, query, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []entity.Category
+	for rows.Next() {
+		var category entity.Category
+		if rows.Scan(&category.ID, &category.PostID, &category.Name); err != nil {
+			return nil, err
+		}
+
+		categories = append(categories, category)
+	}
+
+	if rows.Err() != nil {
+		return nil, err
+	}
+
+	return categories, nil
 }
