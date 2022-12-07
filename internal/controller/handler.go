@@ -22,11 +22,12 @@ type PostHandler interface {
 	GetAllPosts(w http.ResponseWriter, r *http.Request)
 	CreatePost(w http.ResponseWriter, r *http.Request)
 	GetPostByID(w http.ResponseWriter, r *http.Request)
-	// GetAllPostsByCategoryID()
 }
 
 type CategoryHandler interface {
 	CreateCategory(w http.ResponseWriter, r *http.Request)
+	GetAllCategories(w http.ResponseWriter, r *http.Request)
+	GetCategoryByID(w http.ResponseWriter, r *http.Request)
 }
 
 type CommentHandler interface {

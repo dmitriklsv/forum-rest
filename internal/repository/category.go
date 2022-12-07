@@ -35,7 +35,12 @@ func (c *categoryDB) CreateCategory(ctx context.Context, categories []entity.Cat
 		defer st.Close()
 
 		res, err := st.ExecContext(ctx, category.PostID, category.Name)
-		if err != nil {
+		switch {
+		case err == nil:
+		case err.Error() == "UNIQUE constraint failed: categories.name":
+			createdCatIDs[i] = -1
+			continue
+		default:
 			return nil, err
 		}
 
@@ -44,4 +49,47 @@ func (c *categoryDB) CreateCategory(ctx context.Context, categories []entity.Cat
 	}
 
 	return createdCatIDs, nil
+}
+
+func (c *categoryDB) GetAllCategories(ctx context.Context) ([]entity.Category, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+	// TODO: read join table
+	query := `SELECT * FROM categories`
+	rows, err := c.storage.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var categories []entity.Category
+	for rows.Next() {
+		var category entity.Category
+		if err := rows.Scan(&category.ID, &category.PostID, &category.Name); err != nil {
+			return nil, err
+		}
+
+		categories = append(categories, category)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return categories, nil
+}
+
+func (c *categoryDB) GetCategoryByID(ctx context.Context, categoryID uint64) (entity.Category, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+
+	query := `SELECT * FROM categories WHERE id = ?`
+	row := c.storage.QueryRowContext(ctx, query, categoryID)
+
+	var category entity.Category
+	if err := row.Scan(&category.ID, &category.ID, &category.Name); err != nil {
+		return entity.Category{}, err
+	}
+
+	return category, nil
 }

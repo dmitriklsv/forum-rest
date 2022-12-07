@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -48,7 +47,7 @@ func (h *welcomeHandler) HomePage(w http.ResponseWriter, r *http.Request) {
 
 func (h *welcomeHandler) Middleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("middleware")
+		// fmt.Println("middleware")
 		c, err := r.Cookie("session_token")
 		// fmt.Println(c.Valid())
 		if err != nil {

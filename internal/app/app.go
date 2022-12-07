@@ -11,16 +11,19 @@ import (
 
 const (
 	welcome = "/"
-	// home       = "/home"
-	signup           = "/signup"
-	signin           = "/signin"
-	createPost       = "/create_post"
-	getAllPosts      = "/get_all_posts"
-	getPostByID      = "/get_post_by_id"
+	// auth
+	signup = "/signup"
+	signin = "/signin"
+	// post
+	createPost  = "/create_post"
+	getAllPosts = "/get_all_posts"
+	getPostByID = "/get_post_by_id"
+	// category
 	createCategory   = "/create_category"
 	getAllCategories = "/get_all_categories"
 	getCategoryByID  = "/get_category_by_id"
-	createComment    = "/create_comment"
+	// comment
+	createComment = "/create_comment"
 )
 
 func Run(handlers *controller.Handlers) error {
@@ -38,8 +41,8 @@ func Run(handlers *controller.Handlers) error {
 
 	// cat
 	router.Handle(createCategory, handlers.Middleware(handlers.CreateCategory))
-	// router.HandleFunc(getAllCategories, handlers.GetAllCategories)
-	// router.HandleFunc(getCategoryByID, handlers.GetCategoryByID)
+	router.HandleFunc(getAllCategories, handlers.GetAllCategories)
+	router.HandleFunc(getCategoryByID, handlers.GetCategoryByID)
 
 	// comment
 	router.Handle(createComment, handlers.Middleware(handlers.CreateComment))

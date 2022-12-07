@@ -21,13 +21,15 @@ type SessionRepo interface {
 }
 
 type PostRepo interface {
+	CreatePost(ctx context.Context, post entity.Post) (int64, error)
 	GetAllPosts(ctx context.Context) ([]entity.Post, error)
 	GetPostByID(ctx context.Context, postID uint64) (entity.Post, error)
-	CreatePost(ctx context.Context, post entity.Post) (int64, error)
 }
 
 type CategoryRepo interface {
 	CreateCategory(ctx context.Context, categories []entity.Category) ([]int64, error)
+	GetAllCategories(ctx context.Context) ([]entity.Category, error)
+	GetCategoryByID(ctx context.Context, categoryID uint64) (entity.Category, error)
 }
 
 type CommentRepo interface {
