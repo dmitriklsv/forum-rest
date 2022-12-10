@@ -54,6 +54,15 @@ const (
 		FOREIGN KEY (user_id) REFERENCES users (id),
 		FOREIGN KEY (post_id) REFERENCES posts (id)
 	);`
+
+	post_reaction_table = `CREATE TABLE IF NOT EXISTS reactions (
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		"post_id" INTEGER,
+		"user_id" INTEGER,
+		"reaction" INTEGER,
+		FOREIGN KEY (post_id) REFERENCES posts (id),
+		FOREIGN KEY (user_id) REFERENCES users (id)
+	);`
 )
 
 type DB struct {
@@ -80,7 +89,7 @@ func Connect() (*DB, error) {
 func prepareTables(db *sql.DB) (sql.Result, error) {
 	log.Println("| | | checking database for existing tables...")
 
-	arr := []string{users_table, sessions_table, posts_table, categories_table /* postcategory_table, */, comment_table}
+	arr := []string{users_table, sessions_table, posts_table, categories_table /* postcategory_table, */, comment_table, post_reaction_table}
 
 	for i := 0; i < len(arr); i++ {
 		st, err := db.Prepare(arr[i])

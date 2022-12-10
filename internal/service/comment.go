@@ -26,3 +26,7 @@ func (c *commentService) CreateComment(ctx context.Context, comment entity.Comme
 func (c *commentService) GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error) {
 	return c.commentRepo.GetCommentByID(ctx, commentID)
 }
+
+func (c *commentService) GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error) {
+	return c.commentRepo.GetCommentsByPostID(ctx, postID)
+}

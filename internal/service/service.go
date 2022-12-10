@@ -29,6 +29,11 @@ type CategoryService interface {
 type CommentService interface {
 	CreateComment(ctx context.Context, comment entity.Comment) (int64, error)
 	GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error)
+	GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error)
+}
+
+type ReactionService interface {
+	SetPostReaction(ctx context.Context, reaction entity.PostReaction) error
 }
 
 type Services struct {
@@ -36,6 +41,7 @@ type Services struct {
 	PostService
 	CategoryService
 	CommentService
+	ReactionService
 }
 
 func NewServices(repository *repository.Repositories) *Services {
@@ -44,5 +50,6 @@ func NewServices(repository *repository.Repositories) *Services {
 		PostService:     NewPostService(repository.PostRepo, repository.CategoryRepo),
 		CategoryService: NewCategoryService(repository.CategoryRepo),
 		CommentService:  NewCommentService(repository.CommentRepo),
+		ReactionService: NewReactionService(repository.ReactionRepo),
 	}
 }

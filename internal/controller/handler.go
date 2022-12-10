@@ -32,6 +32,11 @@ type CategoryHandler interface {
 type CommentHandler interface {
 	CreateComment(w http.ResponseWriter, r *http.Request)
 	GetCommentByID(w http.ResponseWriter, r *http.Request)
+	GetCommentsByPostID(w http.ResponseWriter, r *http.Request)
+}
+
+type ReactionHandler interface {
+	SetPostReaction(w http.ResponseWriter, r *http.Request)
 }
 
 type Handlers struct {
@@ -40,6 +45,7 @@ type Handlers struct {
 	PostHandler
 	CategoryHandler
 	CommentHandler
+	ReactionHandler
 }
 
 func NewHandlers(services *service.Services) *Handlers {
@@ -49,5 +55,6 @@ func NewHandlers(services *service.Services) *Handlers {
 		PostHandler:     NewPostHandler(services.PostService),
 		CategoryHandler: NewCategoryHandler(services.CategoryService),
 		CommentHandler:  NewCommentHandler(services.CommentService),
+		ReactionHandler: NewReactionHandler(services.ReactionService),
 	}
 }

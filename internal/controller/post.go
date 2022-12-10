@@ -34,18 +34,18 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, errors.InvalidData, http.StatusBadRequest)
 		return
 	}
 
 	postID, err := p.service.CreatePost(r.Context(), post)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err = json.NewEncoder(w).Encode(postID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }

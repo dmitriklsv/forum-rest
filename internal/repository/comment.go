@@ -54,3 +54,31 @@ func (c *commentDB) GetCommentByID(ctx context.Context, commentID uint64) (entit
 
 	return comment, nil
 }
+
+func (c *commentDB) GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+
+	query := `SELECT * FROM comments WHERE post_id = ?`
+	rows, err := c.storage.QueryContext(ctx, query, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var comments []entity.Comment
+	for rows.Next() {
+		var comment entity.Comment
+		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Text); err != nil {
+			return nil, err
+		}
+
+		comments = append(comments, comment)
+	}
+
+	if rows.Err() != nil {
+		return nil, err
+	}
+
+	return comments, nil
+}

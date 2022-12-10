@@ -36,6 +36,11 @@ type CategoryRepo interface {
 type CommentRepo interface {
 	CreateComment(ctx context.Context, comment entity.Comment) (int64, error)
 	GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error)
+	GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error)
+}
+
+type ReactionRepo interface {
+	SetPostReaction(ctx context.Context, reaction entity.PostReaction) error
 }
 
 type Repositories struct {
@@ -44,6 +49,7 @@ type Repositories struct {
 	PostRepo
 	CategoryRepo
 	CommentRepo
+	ReactionRepo
 }
 
 func NewRepos(db *sqlite3.DB) *Repositories {
@@ -53,5 +59,6 @@ func NewRepos(db *sqlite3.DB) *Repositories {
 		PostRepo:     NewPostRepo(db),
 		CategoryRepo: NewCategoryRepo(db),
 		CommentRepo:  NewCommentRepo(db),
+		ReactionRepo: NewReactionRepo(db),
 	}
 }

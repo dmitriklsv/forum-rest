@@ -74,3 +74,28 @@ func (c *commentHandler) GetCommentByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 }
+
+func (c *commentHandler) GetCommentsByPostID(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	defer r.Body.Close()
+
+	var comment entity.Comment
+	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
+		http.Error(w, errors.Bruhhh, http.StatusBadRequest)
+		return
+	}
+
+	comments, err := c.service.GetCommentsByPostID(r.Context(), comment.PostID)
+	if err != nil {
+		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(comments); err != nil {
+		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		return
+	}
+}
