@@ -34,6 +34,7 @@ type CommentService interface {
 
 type ReactionService interface {
 	SetPostReaction(ctx context.Context, reaction entity.PostReaction) error
+	SetCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
 }
 
 type Services struct {

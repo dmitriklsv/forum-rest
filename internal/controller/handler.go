@@ -37,6 +37,7 @@ type CommentHandler interface {
 
 type ReactionHandler interface {
 	SetPostReaction(w http.ResponseWriter, r *http.Request)
+	SetCommentReaction(w http.ResponseWriter, r *http.Request)
 }
 
 type Handlers struct {

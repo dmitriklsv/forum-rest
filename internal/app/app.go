@@ -57,6 +57,7 @@ func Run(handlers *controller.Handlers) error {
 
 	// reaction
 	router.Handle(setPostReaction, handlers.Middleware(handlers.SetPostReaction))
+	router.Handle(setCommentReaction, handlers.Middleware(handlers.SetCommentReaction))
 
 	// home
 	router.HandleFunc(welcome, handlers.WelcomePage)

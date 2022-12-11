@@ -9,21 +9,21 @@ import (
 	"forum/pkg/sqlite3"
 )
 
-type reactionRepo struct {
+type postReactionRepo struct {
 	storage *sql.DB
 }
 
-func NewReactionRepo(database *sqlite3.DB) ReactionRepo {
-	return &reactionRepo{
+func NewPostReactionRepo(database *sqlite3.DB) PostReactionRepo {
+	return &postReactionRepo{
 		storage: database.Collection,
 	}
 }
 
-func (rct *reactionRepo) CreatePostReaction(ctx context.Context, reaction entity.PostReaction) error {
+func (rct *postReactionRepo) CreatePostReaction(ctx context.Context, reaction entity.PostReaction) error {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	query := `INSERT INTO reactions (post_id, user_id, reaction) VALUES (?, ?, ?)`
+	query := `INSERT INTO post_reactions (post_id, user_id, reaction) VALUES (?, ?, ?)`
 	st, err := rct.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return err
@@ -37,11 +37,11 @@ func (rct *reactionRepo) CreatePostReaction(ctx context.Context, reaction entity
 	return nil
 }
 
-func (rct *reactionRepo) GetReactionByPost(ctx context.Context, userID, postID uint64) (entity.PostReaction, error) {
+func (rct *postReactionRepo) GetReactionByPost(ctx context.Context, userID, postID uint64) (entity.PostReaction, error) {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	query := `SELECT * FROM reactions WHERE post_id = ? AND user_id = ?`
+	query := `SELECT * FROM post_reactions WHERE post_id = ? AND user_id = ?`
 	row := rct.storage.QueryRowContext(ctx, query, postID, userID)
 
 	var reaction entity.PostReaction
@@ -52,11 +52,11 @@ func (rct *reactionRepo) GetReactionByPost(ctx context.Context, userID, postID u
 	return reaction, nil
 }
 
-func (rct *reactionRepo) UpdatePostReaction(ctx context.Context, reaction entity.PostReaction) error {
+func (rct *postReactionRepo) UpdatePostReaction(ctx context.Context, reaction entity.PostReaction) error {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	query := `UPDATE reactions SET reaction = ? WHERE post_id = ? AND user_id = ?`
+	query := `UPDATE post_reactions SET reaction = ? WHERE post_id = ? AND user_id = ?`
 	st, err := rct.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return err
@@ -70,11 +70,11 @@ func (rct *reactionRepo) UpdatePostReaction(ctx context.Context, reaction entity
 	return nil
 }
 
-func (rct *reactionRepo) DeletePostReaction(ctx context.Context, reaction entity.PostReaction) error {
+func (rct *postReactionRepo) DeletePostReaction(ctx context.Context, reaction entity.PostReaction) error {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	query := `DELETE FROM reactions WHERE id = ?`
+	query := `DELETE FROM post_reactions WHERE id = ?`
 	st, err := rct.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return err

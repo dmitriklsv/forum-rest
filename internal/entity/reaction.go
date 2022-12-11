@@ -13,12 +13,3 @@ type CommentReaction struct {
 	UserID    uint64 `json:"user_id,omitempty"`
 	Reaction  int64  `json:"reaction,omitempty"`
 }
-
-// type Reaction struct {
-// 	Type  string `json:"type,omitempty"`
-// 	State bool
-// }
-
-// 0- none
-// 1- post
-// 2- comment

@@ -39,11 +39,23 @@ type CommentRepo interface {
 	GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error)
 }
 
-type ReactionRepo interface {
+type PostReactionRepo interface {
 	CreatePostReaction(ctx context.Context, reaction entity.PostReaction) error
 	GetReactionByPost(ctx context.Context, userID, postID uint64) (entity.PostReaction, error)
 	UpdatePostReaction(ctx context.Context, reaction entity.PostReaction) error
 	DeletePostReaction(ctx context.Context, reaction entity.PostReaction) error
+}
+
+type CommentReactionRepo interface {
+	CreateCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
+	GetReactionByComment(ctx context.Context, userID, commentID uint64) (entity.CommentReaction, error)
+	UpdateCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
+	DeleteCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
+}
+
+type ReactionRepo struct {
+	PostReactionRepo
+	CommentReactionRepo
 }
 
 type Repositories struct {
@@ -62,6 +74,9 @@ func NewRepos(db *sqlite3.DB) *Repositories {
 		PostRepo:     NewPostRepo(db),
 		CategoryRepo: NewCategoryRepo(db),
 		CommentRepo:  NewCommentRepo(db),
-		ReactionRepo: NewReactionRepo(db),
+		ReactionRepo: ReactionRepo{
+			NewPostReactionRepo(db),
+			NewCommentReactionRepo(db),
+		},
 	}
 }
