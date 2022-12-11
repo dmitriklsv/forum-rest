@@ -7,7 +7,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/service"
-	"forum/internal/tool/errors"
+	"forum/internal/tool/customErr"
 )
 
 type postHandler struct {
@@ -34,18 +34,18 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, errors.InvalidData, http.StatusBadRequest)
+		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
 	postID, err := p.service.CreatePost(r.Context(), post)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err = json.NewEncoder(w).Encode(postID); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
@@ -58,12 +58,12 @@ func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 
 	posts, err := p.service.GetAllPosts(r.Context())
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(posts); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
@@ -77,18 +77,18 @@ func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 
 	var post entity.Post
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, errors.InvalidData, http.StatusBadRequest)
+		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
 	post, err := p.service.GetPostByID(r.Context(), post.ID)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(post); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }

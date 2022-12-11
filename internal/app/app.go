@@ -59,7 +59,7 @@ func Run(handlers *controller.Handlers) error {
 	router.Handle(setPostReaction, handlers.Middleware(handlers.SetPostReaction))
 
 	// home
-	router.Handle(welcome, handlers.Middleware(handlers.WelcomePage))
+	router.HandleFunc(welcome, handlers.WelcomePage)
 	// router.Handle(home, handlers.Middleware(handlers.HomePage))
 
 	return ListenAndServe(router)

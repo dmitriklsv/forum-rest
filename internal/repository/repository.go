@@ -40,7 +40,10 @@ type CommentRepo interface {
 }
 
 type ReactionRepo interface {
-	SetPostReaction(ctx context.Context, reaction entity.PostReaction) error
+	CreatePostReaction(ctx context.Context, reaction entity.PostReaction) error
+	GetReactionByPost(ctx context.Context, userID, postID uint64) (entity.PostReaction, error)
+	UpdatePostReaction(ctx context.Context, reaction entity.PostReaction) error
+	DeletePostReaction(ctx context.Context, reaction entity.PostReaction) error
 }
 
 type Repositories struct {

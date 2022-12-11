@@ -7,7 +7,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/service"
-	"forum/internal/tool/errors"
+	"forum/internal/tool/customErr"
 )
 
 type categoryHandler struct {
@@ -29,12 +29,12 @@ func (c *categoryHandler) GetAllCategories(w http.ResponseWriter, r *http.Reques
 
 	categories, err := c.service.GetAllCategories(r.Context())
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(categories); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
@@ -48,18 +48,18 @@ func (c *categoryHandler) GetCategoryByID(w http.ResponseWriter, r *http.Request
 
 	var category entity.Category
 	if err := json.NewDecoder(r.Body).Decode(&category); err != nil {
-		http.Error(w, errors.Bruhhh, http.StatusBadRequest)
+		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
 	category, err := c.service.GetCategoryByID(r.Context(), category.ID)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(category); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }

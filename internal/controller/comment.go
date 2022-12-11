@@ -7,7 +7,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/service"
-	"forum/internal/tool/errors"
+	"forum/internal/tool/customErr"
 )
 
 type commentHandler struct {
@@ -34,18 +34,18 @@ func (c *commentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	}
 	// TODO: create customer
 	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
-		http.Error(w, errors.InvalidData, http.StatusBadRequest)
+		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
 	commentID, err := c.service.CreateComment(r.Context(), comment)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(commentID); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
@@ -59,18 +59,18 @@ func (c *commentHandler) GetCommentByID(w http.ResponseWriter, r *http.Request) 
 
 	var comment entity.Comment
 	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
-		http.Error(w, errors.Bruhhh, http.StatusBadRequest)
+		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
 	comment, err := c.service.GetCommentByID(r.Context(), comment.ID)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(comment); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
@@ -84,18 +84,18 @@ func (c *commentHandler) GetCommentsByPostID(w http.ResponseWriter, r *http.Requ
 
 	var comment entity.Comment
 	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
-		http.Error(w, errors.Bruhhh, http.StatusBadRequest)
+		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
 	comments, err := c.service.GetCommentsByPostID(r.Context(), comment.PostID)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(comments); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }

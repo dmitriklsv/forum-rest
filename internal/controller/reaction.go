@@ -6,7 +6,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/service"
-	"forum/internal/tool/errors"
+	"forum/internal/tool/customErr"
 )
 
 type reactionHandler struct {
@@ -32,12 +32,12 @@ func (rct *reactionHandler) SetPostReaction(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&reaction); err != nil {
-		http.Error(w, errors.InvalidData, http.StatusBadRequest)
+		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
 	if err := rct.service.SetPostReaction(r.Context(), reaction); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
