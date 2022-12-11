@@ -27,7 +27,7 @@ func (r *reactionService) SetPostReaction(ctx context.Context, sentReaction enti
 
 	curReaction, err := r.reactionRepo.PostReactionRepo.GetReactionByPost(ctx, sentReaction.UserID, sentReaction.PostID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, sql.ErrNoRows) && sentReaction.PostID != 0 {
 			return r.reactionRepo.PostReactionRepo.CreatePostReaction(ctx, sentReaction)
 		}
 		return err
@@ -47,7 +47,7 @@ func (r *reactionService) SetCommentReaction(ctx context.Context, sentReaction e
 
 	curReaction, err := r.reactionRepo.CommentReactionRepo.GetReactionByComment(ctx, sentReaction.UserID, sentReaction.CommentID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, sql.ErrNoRows) && sentReaction.CommentID != 0 {
 			return r.reactionRepo.CommentReactionRepo.CreateCommentReaction(ctx, sentReaction)
 		}
 		return err

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"forum/internal/entity"
@@ -25,7 +26,17 @@ func (c *commentDB) CreateComment(ctx context.Context, comment entity.Comment) (
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	query := `INSERT INTO comments (user_id, post_id, text) VALUES (?, ?, ?)`
+	query := `SELECT EXISTS (SELECT 1 FROM posts WHERE id = ?)`
+	row := c.storage.QueryRowContext(ctx, query, comment.PostID)
+	var t int
+	if err := row.Scan(&t); err != nil {
+		return 0, err
+	}
+	if t == 0 {
+		return 0, fmt.Errorf("invalid post")
+	}
+
+	query = `INSERT INTO comments (user_id, post_id, text) VALUES (?, ?, ?)`
 	st, err := c.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return -1, err
