@@ -23,14 +23,14 @@ func (rct *reactionRepo) CreatePostReaction(ctx context.Context, reaction entity
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	query := `INSERT INTO reactions (post_id, user_id, reaction, type) VALUES (?, ?, ?, ?)`
+	query := `INSERT INTO reactions (post_id, user_id, reaction) VALUES (?, ?, ?)`
 	st, err := rct.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return err
 	}
 	defer st.Close()
 
-	if _, err = st.ExecContext(ctx, reaction.PostID, reaction.UserID, reaction.Reaction.State, reaction.Reaction.Type); err != nil {
+	if _, err = st.ExecContext(ctx, reaction.PostID, reaction.UserID, reaction.Reaction); err != nil {
 		return err
 	}
 
@@ -71,5 +71,19 @@ func (rct *reactionRepo) UpdatePostReaction(ctx context.Context, reaction entity
 }
 
 func (rct *reactionRepo) DeletePostReaction(ctx context.Context, reaction entity.PostReaction) error {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+
+	query := `DELETE FROM reactions WHERE id = ?`
+	st, err := rct.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer st.Close()
+
+	if _, err = st.ExecContext(ctx, reaction.ID); err != nil {
+		return err
+	}
+
 	return nil
 }

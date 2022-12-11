@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"forum/internal/entity"
 	"forum/internal/repository"
@@ -13,33 +14,28 @@ type reactionService struct {
 	reactionRepo repository.ReactionRepo
 }
 
-func NewReactionService(rctRepo repository.ReactionRepo) ReactionService {
+func NewReactionService(curReactionRepo repository.ReactionRepo) ReactionService {
 	return &reactionService{
-		reactionRepo: rctRepo,
+		reactionRepo: curReactionRepo,
 	}
 }
 
-func (r *reactionService) SetPostReaction(ctx context.Context, reaction entity.PostReaction) error {
-	rct, err := r.reactionRepo.GetReactionByPost(ctx, reaction.UserID, reaction.PostID)
+func (r *reactionService) SetPostReaction(ctx context.Context, sentReaction entity.PostReaction) error {
+	if sentReaction.Reaction < 0 || sentReaction.Reaction > 1 {
+		return fmt.Errorf("invalid reaction type")
+	}
+
+	curReaction, err := r.reactionRepo.GetReactionByPost(ctx, sentReaction.UserID, sentReaction.PostID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return r.reactionRepo.CreatePostReaction(ctx, reaction)
+			return r.reactionRepo.CreatePostReaction(ctx, sentReaction)
 		}
 		return err
 	}
 
-	switch rct.Reaction.Type {
-	case "like":
-		if rct.Reaction.State {
-			return r.reactionRepo.UpdatePostReaction(ctx, reaction)
-		}
-		return r.reactionRepo.DeletePostReaction(ctx, rct)
-	case "dislike":
-		if rct.Reaction.State {
-			return r.reactionRepo.UpdatePostReaction(ctx, reaction)
-		}
-		return r.reactionRepo.DeletePostReaction(ctx, rct)
+	if sentReaction.Reaction == curReaction.Reaction {
+		return r.reactionRepo.DeletePostReaction(ctx, curReaction)
 	}
 
-	return nil
+	return r.reactionRepo.UpdatePostReaction(ctx, sentReaction)
 }

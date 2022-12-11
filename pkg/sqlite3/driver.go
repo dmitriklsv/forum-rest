@@ -60,7 +60,6 @@ const (
 		"post_id" INTEGER,
 		"user_id" INTEGER,
 		"reaction" INTEGER,
-		"type" TEXT,
 		FOREIGN KEY (post_id) REFERENCES posts (id),
 		FOREIGN KEY (user_id) REFERENCES users (id)
 	);`
