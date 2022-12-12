@@ -38,5 +38,3 @@ func main() {
 		return
 	}
 }
-
-// Solve creating comment to unexisting posts!!!

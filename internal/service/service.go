@@ -48,7 +48,7 @@ type Services struct {
 func NewServices(repository *repository.Repositories) *Services {
 	return &Services{
 		Authentication:  NewAuthService(repository.UserRepo, repository.SessionRepo),
-		PostService:     NewPostService(repository.PostRepo, repository.CategoryRepo),
+		PostService:     NewPostService(repository.PostRepo, repository.CategoryRepo, repository.ReactionRepo),
 		CategoryService: NewCategoryService(repository.CategoryRepo),
 		CommentService:  NewCommentService(repository.CommentRepo),
 		ReactionService: NewReactionService(repository.ReactionRepo),

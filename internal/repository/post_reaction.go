@@ -37,6 +37,34 @@ func (rct *postReactionRepo) CreatePostReaction(ctx context.Context, reaction en
 	return nil
 }
 
+func (rct *postReactionRepo) GetReactionsByPostID(ctx context.Context, postID uint64) ([]entity.PostReaction, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+
+	query := `SELECT * FROM post_reactions WHERE post_id = ?`
+	rows, err := rct.storage.QueryContext(ctx, query, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reactions []entity.PostReaction
+	for rows.Next() {
+		var reaction entity.PostReaction
+		if rows.Scan(&reaction.ID, &reaction.PostID, &reaction.UserID, &reaction.Reaction); err != nil {
+			return nil, err
+		}
+
+		reactions = append(reactions, reaction)
+	}
+
+	if rows.Err() != nil {
+		return nil, err
+	}
+
+	return reactions, nil
+}
+
 func (rct *postReactionRepo) GetReactionByPost(ctx context.Context, userID, postID uint64) (entity.PostReaction, error) {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
