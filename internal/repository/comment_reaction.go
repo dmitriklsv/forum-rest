@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"forum/internal/entity"
 	"forum/internal/tool/config"
@@ -13,7 +14,7 @@ type commentReactionRepo struct {
 	storage *sql.DB
 }
 
-func NewCommentReactionRepo(database *sqlite3.DB) *commentReactionRepo {
+func NewCommentReactionRepo(database *sqlite3.DB) CommentReactionRepo {
 	return &commentReactionRepo{
 		storage: database.Collection,
 	}
@@ -41,6 +42,7 @@ func (rct *commentReactionRepo) GetReactionByComment(ctx context.Context, userID
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
+	fmt.Println(commentID)
 	query := `SELECT * FROM comment_reactions WHERE comment_id = ? AND user_id = ?`
 	row := rct.storage.QueryRowContext(ctx, query, commentID, userID)
 

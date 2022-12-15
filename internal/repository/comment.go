@@ -15,7 +15,7 @@ type commentDB struct {
 	storage *sql.DB
 }
 
-func NewCommentRepo(database *sqlite3.DB) *commentDB {
+func NewCommentRepo(database *sqlite3.DB) CommentRepo {
 	log.Println("| | comment repository is done!")
 	return &commentDB{
 		storage: database.Collection,

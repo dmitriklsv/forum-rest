@@ -14,7 +14,7 @@ type postDB struct {
 	storage *sql.DB
 }
 
-func NewPostRepo(database *sqlite3.DB) *postDB {
+func NewPostRepo(database *sqlite3.DB) PostRepo {
 	log.Println("| | post repository is done!")
 	return &postDB{
 		storage: database.Collection,

@@ -14,7 +14,7 @@ type postHandler struct {
 	service service.PostService
 }
 
-func NewPostHandler(service service.PostService) *postHandler {
+func NewPostHandler(service service.PostService) PostHandler {
 	log.Println("| | post handler is done!")
 	return &postHandler{
 		service: service,

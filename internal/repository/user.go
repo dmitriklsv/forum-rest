@@ -14,7 +14,7 @@ type userDB struct {
 	storage *sql.DB
 }
 
-func NewUserRepo(database *sqlite3.DB) *userDB {
+func NewUserRepo(database *sqlite3.DB) UserRepo {
 	log.Println("| | user repository is done!")
 	return &userDB{
 		storage: database.Collection,

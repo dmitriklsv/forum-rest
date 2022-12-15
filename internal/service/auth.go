@@ -20,7 +20,7 @@ type authService struct {
 	sessionRepo repository.SessionRepo
 }
 
-func NewAuthService(uRepo repository.UserRepo, sRepo repository.SessionRepo) *authService {
+func NewAuthService(uRepo repository.UserRepo, sRepo repository.SessionRepo) Authentication {
 	log.Println("| | authentication service is done!")
 	return &authService{
 		userRepo:    uRepo,

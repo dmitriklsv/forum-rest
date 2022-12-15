@@ -14,7 +14,7 @@ type commentHandler struct {
 	service service.CommentService
 }
 
-func NewCommentHandler(service service.CommentService) *commentHandler {
+func NewCommentHandler(service service.CommentService) CommentHandler {
 	log.Println("| | comment handler is done!")
 	return &commentHandler{
 		service: service,
@@ -69,6 +69,7 @@ func (c *commentHandler) GetCommentByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// fmt.Println(comment)
 	if err := json.NewEncoder(w).Encode(comment); err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return

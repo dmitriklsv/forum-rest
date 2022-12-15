@@ -14,7 +14,7 @@ type sessionDB struct {
 	storage *sql.DB
 }
 
-func NewSessionRepo(database *sqlite3.DB) *sessionDB {
+func NewSessionRepo(database *sqlite3.DB) SessionRepo {
 	log.Println("| | session repository is done!")
 	return &sessionDB{
 		storage: database.Collection,

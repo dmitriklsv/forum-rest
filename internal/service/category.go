@@ -12,7 +12,7 @@ type categoryService struct {
 	catRepo repository.CategoryRepo
 }
 
-func NewCategoryService(catRepo repository.CategoryRepo) *categoryService {
+func NewCategoryService(catRepo repository.CategoryRepo) CategoryService {
 	log.Println("| | category service is done!")
 	return &categoryService{
 		catRepo: catRepo,
