@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"forum/internal/entity"
@@ -27,18 +26,49 @@ func (c *commentService) CreateComment(ctx context.Context, comment entity.Comme
 }
 
 func (c *commentService) GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error) {
-	comment, _ := c.commentRepo.GetCommentByID(ctx, commentID)
-	fmt.Println(comment)
-	reaction, err := c.reactionRepo.GetReactionByComment(ctx, comment.UserID, comment.ID)
+	reactions, err := c.reactionRepo.GetReactionsByCommentID(ctx, commentID)
 	if err != nil {
-		fmt.Println(err)
 		return entity.Comment{}, err
 	}
-	fmt.Println(reaction)
 
-	return c.commentRepo.GetCommentByID(ctx, commentID)
+	comment, err := c.commentRepo.GetCommentByID(ctx, commentID)
+	if err != nil {
+		return entity.Comment{}, err
+	}
+	comment.Rating = c.setRating(reactions)
+
+	return comment, nil
 }
 
 func (c *commentService) GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error) {
-	return c.commentRepo.GetCommentsByPostID(ctx, postID)
+	comments, err := c.commentRepo.GetCommentsByPostID(ctx, postID)
+	if err != nil {
+		return nil, err
+	}
+
+	comments_len := len(comments)
+	for i := 0; i < comments_len; i++ {
+		reactions, err := c.reactionRepo.GetReactionsByCommentID(ctx, comments[i].ID)
+		if err != nil {
+			return nil, err
+		}
+
+		comments[i].Rating = c.setRating(reactions)
+	}
+
+	return comments, nil
+}
+
+func (c *commentService) setRating(reactions []entity.CommentReaction) int64 {
+	var rating int64
+
+	for _, reaction := range reactions {
+		if reaction.Reaction == 1 {
+			rating++
+		} else {
+			rating--
+		}
+	}
+
+	return rating
 }

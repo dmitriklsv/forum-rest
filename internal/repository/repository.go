@@ -50,6 +50,7 @@ type PostReactionRepo interface {
 
 type CommentReactionRepo interface {
 	CreateCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
+	GetReactionsByCommentID(ctx context.Context, commentID uint64) ([]entity.CommentReaction, error)
 	GetReactionByComment(ctx context.Context, userID, commentID uint64) (entity.CommentReaction, error)
 	UpdateCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
 	DeleteCommentReaction(ctx context.Context, reaction entity.CommentReaction) error

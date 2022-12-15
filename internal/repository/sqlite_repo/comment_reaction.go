@@ -3,7 +3,6 @@ package sqlite_repo
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"forum/internal/entity"
 	"forum/internal/tool/config"
@@ -38,11 +37,38 @@ func (rct *commentReactionRepo) CreateCommentReaction(ctx context.Context, react
 	return nil
 }
 
+func (rct *commentReactionRepo) GetReactionsByCommentID(ctx context.Context, commentID uint64) ([]entity.CommentReaction, error) {
+	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
+	defer cancel()
+
+	query := `SELECT * FROM comment_reactions WHERE comment_id = ?`
+	rows, err := rct.storage.QueryContext(ctx, query, commentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var reactions []entity.CommentReaction
+	for rows.Next() {
+		var reaction entity.CommentReaction
+		if err := rows.Scan(&reaction.ID, &reaction.CommentID, &reaction.UserID, &reaction.Reaction); err != nil {
+			return nil, err
+		}
+
+		reactions = append(reactions, reaction)
+	}
+
+	if rows.Err() != nil {
+		return nil, err
+	}
+
+	return reactions, nil
+}
+
 func (rct *commentReactionRepo) GetReactionByComment(ctx context.Context, userID, commentID uint64) (entity.CommentReaction, error) {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	fmt.Println(commentID)
 	query := `SELECT * FROM comment_reactions WHERE comment_id = ? AND user_id = ?`
 	row := rct.storage.QueryRowContext(ctx, query, commentID, userID)
 
