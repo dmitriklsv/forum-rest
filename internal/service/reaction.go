@@ -14,7 +14,7 @@ type reactionService struct {
 	reactionRepo repository.ReactionRepo
 }
 
-func NewReactionService(curReactionRepo repository.ReactionRepo) ReactionService {
+func NewReactionService(curReactionRepo repository.ReactionRepo) *reactionService {
 	return &reactionService{
 		reactionRepo: curReactionRepo,
 	}

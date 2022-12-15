@@ -14,7 +14,7 @@ type commentHandler struct {
 	service service.CommentService
 }
 
-func NewCommentHandler(service service.CommentService) CommentHandler {
+func NewCommentHandler(service service.CommentService) *commentHandler {
 	log.Println("| | comment handler is done!")
 	return &commentHandler{
 		service: service,

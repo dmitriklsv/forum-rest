@@ -29,8 +29,6 @@ const (
 	// reaction
 	setPostReaction    = "/set_post_reaction"
 	setCommentReaction = "/set_comment_reaction"
-	// getReactionsByPostID
-	// getReactionsByCommentID
 )
 
 func Run(handlers *controller.Handlers) error {

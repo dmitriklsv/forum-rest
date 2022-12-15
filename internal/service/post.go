@@ -11,10 +11,10 @@ import (
 type postService struct {
 	postRepo     repository.PostRepo
 	catRepo      repository.CategoryRepo
-	reactionRepo repository.ReactionRepo
+	reactionRepo repository.PostReactionRepo
 }
 
-func NewPostService(pRepo repository.PostRepo, catRepo repository.CategoryRepo, rctRepo repository.ReactionRepo) PostService {
+func NewPostService(pRepo repository.PostRepo, catRepo repository.CategoryRepo, rctRepo repository.PostReactionRepo) *postService {
 	log.Println("| | post service is done!")
 	return &postService{
 		postRepo:     pRepo,
@@ -76,7 +76,7 @@ func (p *postService) GetPostByID(ctx context.Context, postID uint64) (entity.Po
 }
 
 func (p *postService) setRating(ctx context.Context, postID uint64) (int64, error) {
-	reactions, err := p.reactionRepo.PostReactionRepo.GetReactionsByPostID(ctx, postID)
+	reactions, err := p.reactionRepo.GetReactionsByPostID(ctx, postID)
 	if err != nil {
 		return 0, err
 	}

@@ -17,7 +17,7 @@ type ctx string
 
 var userCtx ctx = "userCtx"
 
-func NewWelcomeHandler(service service.Authentication) Welcomer {
+func NewWelcomeHandler(service service.Authentication) *welcomeHandler {
 	log.Println("| | welcome handler is done!")
 	return &welcomeHandler{
 		service: service,

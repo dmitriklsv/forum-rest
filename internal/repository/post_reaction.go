@@ -13,7 +13,7 @@ type postReactionRepo struct {
 	storage *sql.DB
 }
 
-func NewPostReactionRepo(database *sqlite3.DB) PostReactionRepo {
+func NewPostReactionRepo(database *sqlite3.DB) *postReactionRepo {
 	return &postReactionRepo{
 		storage: database.Collection,
 	}

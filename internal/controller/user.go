@@ -13,7 +13,7 @@ type userHandler struct {
 	service service.Authentication
 }
 
-func NewUserHandler(service service.Authentication) UserHandler {
+func NewUserHandler(service service.Authentication) *userHandler {
 	log.Println("| | user handler is done!")
 	return &userHandler{
 		service: service,

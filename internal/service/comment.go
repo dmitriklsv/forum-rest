@@ -9,10 +9,11 @@ import (
 )
 
 type commentService struct {
-	commentRepo repository.CommentRepo
+	commentRepo  repository.CommentRepo
+	reactionRepo repository.CommentReactionRepo // make set reaction for comments
 }
 
-func NewCommentService(cRepo repository.CommentRepo) CommentService {
+func NewCommentService(cRepo repository.CommentRepo, reactionRepo repository.CommentReactionRepo) *commentService {
 	log.Println("| | comment service is done!")
 	return &commentService{
 		commentRepo: cRepo,

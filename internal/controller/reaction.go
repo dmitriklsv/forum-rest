@@ -13,7 +13,7 @@ type reactionHandler struct {
 	service service.ReactionService
 }
 
-func NewReactionHandler(service service.ReactionService) ReactionHandler {
+func NewReactionHandler(service service.ReactionService) *reactionHandler {
 	return &reactionHandler{
 		service: service,
 	}

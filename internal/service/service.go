@@ -50,7 +50,7 @@ func NewServices(repository *repository.Repositories) *Services {
 		Authentication:  NewAuthService(repository.UserRepo, repository.SessionRepo),
 		PostService:     NewPostService(repository.PostRepo, repository.CategoryRepo, repository.ReactionRepo),
 		CategoryService: NewCategoryService(repository.CategoryRepo),
-		CommentService:  NewCommentService(repository.CommentRepo),
+		CommentService:  NewCommentService(repository.CommentRepo, repository.CommentReactionRepo),
 		ReactionService: NewReactionService(repository.ReactionRepo),
 	}
 }

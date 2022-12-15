@@ -14,7 +14,7 @@ type categoryDB struct {
 	storage *sql.DB
 }
 
-func NewCategoryRepo(database *sqlite3.DB) CategoryRepo {
+func NewCategoryRepo(database *sqlite3.DB) *categoryDB {
 	log.Println("| | category repository is done!")
 	return &categoryDB{
 		storage: database.Collection,
