@@ -1,4 +1,4 @@
-package repository
+package sqlite_repo
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type postDB struct {
 	storage *sql.DB
 }
 
-func NewPostRepo(database *sqlite3.DB) PostRepo {
+func NewPostRepo(database *sqlite3.DB) *postDB {
 	log.Println("| | post repository is done!")
 	return &postDB{
 		storage: database.Collection,

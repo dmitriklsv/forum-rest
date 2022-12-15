@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type postService struct {
 	reactionRepo repository.PostReactionRepo
 }
 
-func NewPostService(pRepo repository.PostRepo, catRepo repository.CategoryRepo, rctRepo repository.PostReactionRepo) PostService {
+func NewPostService(pRepo repository.PostRepo, catRepo repository.CategoryRepo, rctRepo repository.PostReactionRepo) *postService {
 	log.Println("| | post service is done!")
 	return &postService{
 		postRepo:     pRepo,

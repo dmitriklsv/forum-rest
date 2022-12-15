@@ -1,4 +1,4 @@
-package controller
+package handlers
 
 import (
 	"encoding/json"
@@ -10,18 +10,18 @@ import (
 	"forum/internal/tool/customErr"
 )
 
-type postHandler struct {
-	service service.PostService
+type commentHandler struct {
+	service service.CommentService
 }
 
-func NewPostHandler(service service.PostService) PostHandler {
-	log.Println("| | post handler is done!")
-	return &postHandler{
+func NewCommentHandler(service service.CommentService) *commentHandler {
+	log.Println("| | comment handler is done!")
+	return &commentHandler{
 		service: service,
 	}
 }
 
-func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
+func (c *commentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
@@ -29,65 +29,73 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	userID := r.Context().Value(userCtx)
-	post := entity.Post{
+	comment := entity.Comment{
 		UserID: userID.(uint64),
 	}
-
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+	// TODO: create customer
+	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
 		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
-	postID, err := p.service.CreatePost(r.Context(), post)
+	commentID, err := c.service.CreateComment(r.Context(), comment)
 	if err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
-	if err = json.NewEncoder(w).Encode(postID); err != nil {
+	if err := json.NewEncoder(w).Encode(commentID); err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
 
-func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
-	posts, err := p.service.GetAllPosts(r.Context())
-	if err != nil {
-		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
-		return
-	}
-
-	if err := json.NewEncoder(w).Encode(posts); err != nil {
-		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
-		return
-	}
-}
-
-func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
+func (c *commentHandler) GetCommentByID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 	defer r.Body.Close()
 
-	var post entity.Post
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
+	var comment entity.Comment
+	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
+		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
-	post, err := p.service.GetPostByID(r.Context(), post.ID)
+	comment, err := c.service.GetCommentByID(r.Context(), comment.ID)
 	if err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(post); err != nil {
+	// fmt.Println(comment)
+	if err := json.NewEncoder(w).Encode(comment); err != nil {
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
+		return
+	}
+}
+
+func (c *commentHandler) GetCommentsByPostID(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+	defer r.Body.Close()
+
+	var comment entity.Comment
+	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
+		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
+		return
+	}
+
+	comments, err := c.service.GetCommentsByPostID(r.Context(), comment.PostID)
+	if err != nil {
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(comments); err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}

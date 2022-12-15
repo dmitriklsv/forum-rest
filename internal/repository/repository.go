@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"forum/internal/entity"
+	"forum/internal/repository/sqlite_repo"
 	"forum/pkg/sqlite3"
 )
 
@@ -70,14 +71,14 @@ type Repositories struct {
 
 func NewRepos(db *sqlite3.DB) *Repositories {
 	return &Repositories{
-		UserRepo:     NewUserRepo(db),
-		SessionRepo:  NewSessionRepo(db),
-		PostRepo:     NewPostRepo(db),
-		CategoryRepo: NewCategoryRepo(db),
-		CommentRepo:  NewCommentRepo(db),
+		UserRepo:     sqlite_repo.NewUserRepo(db),
+		SessionRepo:  sqlite_repo.NewSessionRepo(db),
+		PostRepo:     sqlite_repo.NewPostRepo(db),
+		CategoryRepo: sqlite_repo.NewCategoryRepo(db),
+		CommentRepo:  sqlite_repo.NewCommentRepo(db),
 		ReactionRepo: ReactionRepo{
-			NewPostReactionRepo(db),
-			NewCommentReactionRepo(db),
+			sqlite_repo.NewPostReactionRepo(db),
+			sqlite_repo.NewCommentReactionRepo(db),
 		},
 	}
 }

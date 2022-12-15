@@ -1,4 +1,4 @@
-package repository
+package sqlite_repo
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type sessionDB struct {
 	storage *sql.DB
 }
 
-func NewSessionRepo(database *sqlite3.DB) SessionRepo {
+func NewSessionRepo(database *sqlite3.DB) *sessionDB {
 	log.Println("| | session repository is done!")
 	return &sessionDB{
 		storage: database.Collection,

@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type commentService struct {
 	reactionRepo repository.CommentReactionRepo // make set reaction for comments
 }
 
-func NewCommentService(cRepo repository.CommentRepo, reactionRepo repository.CommentReactionRepo) CommentService {
+func NewCommentService(cRepo repository.CommentRepo, reactionRepo repository.CommentReactionRepo) *commentService {
 	log.Println("| | comment service is done!")
 	return &commentService{
 		commentRepo:  cRepo,

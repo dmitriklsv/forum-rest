@@ -1,4 +1,4 @@
-package repository
+package sqlite_repo
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type commentReactionRepo struct {
 	storage *sql.DB
 }
 
-func NewCommentReactionRepo(database *sqlite3.DB) CommentReactionRepo {
+func NewCommentReactionRepo(database *sqlite3.DB) *commentReactionRepo {
 	return &commentReactionRepo{
 		storage: database.Collection,
 	}

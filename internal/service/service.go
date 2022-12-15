@@ -5,6 +5,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/repository"
+	"forum/internal/service/services"
 )
 
 type Authentication interface {
@@ -47,10 +48,10 @@ type Services struct {
 
 func NewServices(repository *repository.Repositories) *Services {
 	return &Services{
-		Authentication:  NewAuthService(repository.UserRepo, repository.SessionRepo),
-		PostService:     NewPostService(repository.PostRepo, repository.CategoryRepo, repository.ReactionRepo),
-		CategoryService: NewCategoryService(repository.CategoryRepo),
-		CommentService:  NewCommentService(repository.CommentRepo, repository.CommentReactionRepo),
-		ReactionService: NewReactionService(repository.ReactionRepo),
+		Authentication:  services.NewAuthService(repository.UserRepo, repository.SessionRepo),
+		PostService:     services.NewPostService(repository.PostRepo, repository.CategoryRepo, repository.ReactionRepo),
+		CategoryService: services.NewCategoryService(repository.CategoryRepo),
+		CommentService:  services.NewCommentService(repository.CommentRepo, repository.CommentReactionRepo),
+		ReactionService: services.NewReactionService(repository.ReactionRepo),
 	}
 }

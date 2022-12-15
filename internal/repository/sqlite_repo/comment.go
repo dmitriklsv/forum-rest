@@ -1,4 +1,4 @@
-package repository
+package sqlite_repo
 
 import (
 	"context"
@@ -15,7 +15,7 @@ type commentDB struct {
 	storage *sql.DB
 }
 
-func NewCommentRepo(database *sqlite3.DB) CommentRepo {
+func NewCommentRepo(database *sqlite3.DB) *commentDB {
 	log.Println("| | comment repository is done!")
 	return &commentDB{
 		storage: database.Collection,

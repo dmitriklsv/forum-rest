@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"forum/internal/controller/handlers"
 	"forum/internal/service"
 )
 
@@ -51,11 +52,11 @@ type Handlers struct {
 
 func NewHandlers(services *service.Services) *Handlers {
 	return &Handlers{
-		Welcomer:        NewWelcomeHandler(services.Authentication),
-		UserHandler:     NewUserHandler(services.Authentication),
-		PostHandler:     NewPostHandler(services.PostService),
-		CategoryHandler: NewCategoryHandler(services.CategoryService),
-		CommentHandler:  NewCommentHandler(services.CommentService),
-		ReactionHandler: NewReactionHandler(services.ReactionService),
+		Welcomer:        handlers.NewWelcomeHandler(services.Authentication),
+		UserHandler:     handlers.NewUserHandler(services.Authentication),
+		PostHandler:     handlers.NewPostHandler(services.PostService),
+		CategoryHandler: handlers.NewCategoryHandler(services.CategoryService),
+		CommentHandler:  handlers.NewCommentHandler(services.CommentService),
+		ReactionHandler: handlers.NewReactionHandler(services.ReactionService),
 	}
 }

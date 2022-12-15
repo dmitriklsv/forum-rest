@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"context"
@@ -20,7 +20,7 @@ type authService struct {
 	sessionRepo repository.SessionRepo
 }
 
-func NewAuthService(uRepo repository.UserRepo, sRepo repository.SessionRepo) Authentication {
+func NewAuthService(uRepo repository.UserRepo, sRepo repository.SessionRepo) *authService {
 	log.Println("| | authentication service is done!")
 	return &authService{
 		userRepo:    uRepo,
