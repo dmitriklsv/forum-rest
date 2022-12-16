@@ -3,8 +3,8 @@ package sqlite_repo
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
+	"strings"
 
 	"forum/internal/entity"
 	"forum/internal/tool/config"
@@ -53,17 +53,20 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 
 	categories := ctx.Value("categories")
 	if categories != nil {
-		// fmt.Printf("%#v\n", categories)
-		query += ` WHERE id IN (SELECT post_id FROM categories WHERE name IN (?))`
-		rows, err = p.storage.QueryContext(ctx, query, categories.(string))
+		categories_len := len(categories.([]string))
+		args := make([]any, categories_len)
+		for i, category := range categories.([]string) {
+			args[i] = category
+		}
+
+		marks := strings.Repeat(" AND post_id IN (SELECT post_id FROM categories WHERE name = ?)", categories_len)
+		query += ` WHERE id IN (SELECT DISTINCT post_id FROM categories WHERE ` + marks[5:] + `)`
+		rows, err = p.storage.QueryContext(ctx, query, args...)
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 	}
 	defer rows.Close()
-
-	// fmt.Println(rows)
 
 	var posts []entity.Post
 	for rows.Next() {
@@ -71,7 +74,7 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 		if err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
 			return nil, err
 		}
-		fmt.Println(post)
+
 		posts = append(posts, post)
 	}
 
@@ -79,7 +82,6 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 		return nil, err
 	}
 
-	fmt.Println(posts)
 	return posts, nil
 }
 

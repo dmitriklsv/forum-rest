@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"forum/internal/entity"
 	"forum/internal/service"
@@ -57,13 +56,14 @@ func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// fmt.Println(len(r.URL.Query()))
 	if len(r.URL.Query()) == 1 {
 		categories := r.URL.Query()["category"]
 		if len(categories) == 0 {
 			http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 			return
 		}
-		r = r.WithContext(context.WithValue(r.Context(), "categories", `"`+strings.Join(categories, `","`)+`"`))
+		r = r.WithContext(context.WithValue(r.Context(), "categories" /*  `"`+strings.Join(categories, `","`)+`"` */, categories))
 	}
 
 	posts, err := p.service.GetAllPosts(r.Context())
