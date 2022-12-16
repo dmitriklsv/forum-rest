@@ -24,6 +24,7 @@ type SessionRepo interface {
 type PostRepo interface {
 	CreatePost(ctx context.Context, post entity.Post) (int64, error)
 	GetAllPosts(ctx context.Context) ([]entity.Post, error)
+	// GetPostsByCategory(ctx context.Context, category string) ([]entity.Post, error)
 	GetPostByID(ctx context.Context, postID uint64) (entity.Post, error)
 }
 

@@ -1,14 +1,17 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"forum/internal/entity"
 	"forum/internal/service"
 	"forum/internal/tool/customErr"
+	"forum/pkg/gayson"
 )
 
 type postHandler struct {
@@ -45,10 +48,7 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = json.NewEncoder(w).Encode(postID); err != nil {
-		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
-		return
-	}
+	gayson.SendJSON(w, postID)
 }
 
 func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
@@ -57,16 +57,22 @@ func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(r.URL.Query()) == 1 {
+		categories := r.URL.Query()["category"]
+		if len(categories) == 0 {
+			http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
+			return
+		}
+		r = r.WithContext(context.WithValue(r.Context(), "categories", `"`+strings.Join(categories, `","`)+`"`))
+	}
+
 	posts, err := p.service.GetAllPosts(r.Context())
 	if err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(posts); err != nil {
-		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
-		return
-	}
+	gayson.SendJSON(w, posts)
 }
 
 func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
@@ -87,8 +93,5 @@ func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(post); err != nil {
-		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
-		return
-	}
+	gayson.SendJSON(w, post)
 }

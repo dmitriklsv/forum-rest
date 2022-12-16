@@ -3,6 +3,7 @@ package sqlite_repo
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"forum/internal/entity"
@@ -43,13 +44,26 @@ func (p *postDB) CreatePost(ctx context.Context, post entity.Post) (int64, error
 func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
-	// TODO: read join table
+
 	query := `SELECT * FROM posts`
 	rows, err := p.storage.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
+
+	categories := ctx.Value("categories")
+	if categories != nil {
+		// fmt.Printf("%#v\n", categories)
+		query += ` WHERE id IN (SELECT post_id FROM categories WHERE name IN (?))`
+		rows, err = p.storage.QueryContext(ctx, query, categories.(string))
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	}
 	defer rows.Close()
+
+	// fmt.Println(rows)
 
 	var posts []entity.Post
 	for rows.Next() {
@@ -57,7 +71,7 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 		if err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
 			return nil, err
 		}
-
+		fmt.Println(post)
 		posts = append(posts, post)
 	}
 
@@ -65,6 +79,7 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 		return nil, err
 	}
 
+	fmt.Println(posts)
 	return posts, nil
 }
 
