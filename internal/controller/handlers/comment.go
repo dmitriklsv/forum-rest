@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"forum/internal/entity"
 	"forum/internal/service"
@@ -55,15 +56,14 @@ func (c *commentHandler) GetCommentByID(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	defer r.Body.Close()
 
-	var comment entity.Comment
-	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
+	commentID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
+	if err != nil {
 		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
-	comment, err := c.service.GetCommentByID(r.Context(), comment.ID)
+	comment, err := c.service.GetCommentByID(r.Context(), commentID)
 	if err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
@@ -81,15 +81,14 @@ func (c *commentHandler) GetCommentsByPostID(w http.ResponseWriter, r *http.Requ
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	defer r.Body.Close()
 
-	var comment entity.Comment
-	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
+	postID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
+	if err != nil {
 		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
-	comments, err := c.service.GetCommentsByPostID(r.Context(), comment.PostID)
+	comments, err := c.service.GetCommentsByPostID(r.Context(), postID)
 	if err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return

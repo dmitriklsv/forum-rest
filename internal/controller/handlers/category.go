@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
-	"forum/internal/entity"
 	"forum/internal/service"
 	"forum/internal/tool/customErr"
 )
@@ -44,15 +44,14 @@ func (c *categoryHandler) GetCategoryByID(w http.ResponseWriter, r *http.Request
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	defer r.Body.Close()
 
-	var category entity.Category
-	if err := json.NewDecoder(r.Body).Decode(&category); err != nil {
+	categoryID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
+	if err != nil {
 		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
-	category, err := c.service.GetCategoryByID(r.Context(), category.ID)
+	category, err := c.service.GetCategoryByID(r.Context(), categoryID)
 	if err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return

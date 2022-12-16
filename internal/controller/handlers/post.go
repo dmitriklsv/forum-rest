@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"forum/internal/entity"
 	"forum/internal/service"
@@ -73,15 +74,14 @@ func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	defer r.Body.Close()
 
-	var post entity.Post
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+	postID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
+	if err != nil {
 		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
-	post, err := p.service.GetPostByID(r.Context(), post.ID)
+	post, err := p.service.GetPostByID(r.Context(), postID)
 	if err != nil {
 		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
