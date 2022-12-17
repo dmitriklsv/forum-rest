@@ -1,15 +1,83 @@
+const getFormData = (formId) => {
+  if (!formId) {
+    console.error("No form id");
+  }
+
+  const formRef = document.getElementById(formId);
+
+  if (!formRef) {
+    console.error("Unable to find form by id");
+  }
+
+  const formData = new FormData(formRef);
+  const data = {};
+  for (const [key, value] of formData.entries()) {
+    data[key] = value;
+  }
+
+  return data;
+};
+
+function serveRegisterMarkup() {
+  const registerFormMarkup = `
+    <form id="registrationForm">
+      <div class="inputGroup">
+        <label for="email">Your e-mail</label>
+        <input id="email" type="email" name="email"></input>
+      </div>
+      <div class="inputGroup">
+        <label for="password">Your password</label>
+        <input id="password" type="password" name="password"></input>
+      </div>
+      <div class="inputGroup">
+        <label for="repeatedPassword">Repeat your password</label>
+        <input id="repeatedPassword" type="password"></input>
+      </div>
+      <div class="inputGroup">
+        <button class="button primary" id="registerButton">Register</button>
+      </div>
+    </form>
+  `;
+
+  document.querySelector("#root").innerHTML = registerFormMarkup;
+
+  const registerButton = document.getElementById("registerButton");
+  console.log(registerButton);
+  registerButton.addEventListener("click", onRegister);
+}
+
+const onRegister = async () => {
+  const formId = "registrationForm";
+
+  const formData = getFormData(formId);
+
+  const response = await fetch("http://localhost:8080/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  });
+
+  return await response.json();
+};
+
 const header = `
-          <div class="header">
-              <h2 class="header-title">forum</h2>
-              <a class="header-profile" href="javascript:;" onclick="onClickProfile()">Profile</a>
-          </div>
-      `;
+<div class="header">
+    <h2 class="header-title">forum</h2>
+    <div class="header-profile">
+      <a class="" href="javascript:;">Login</a>
+      or
+      <a class="" href="javascript:;" id="header-register">Register</a>
+    </div>
+</div>
+`;
 
 document.querySelector("#root").innerHTML = header;
 
-const onClickProfile = () => {
-  console.log(getCookie("{81851175-761f-4d46-80dc-c7bdf5c8387f}"));
-};
+const headerRegister = document.getElementById("header-register");
+headerRegister.onclick = serveRegisterMarkup;
+console.log(headerRegister);
 
 const getCookie = (name) => {
   return document.cookie
