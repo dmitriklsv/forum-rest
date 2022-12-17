@@ -42,7 +42,13 @@ func (rct *commentReactionRepo) GetReactionsByCommentID(ctx context.Context, com
 	defer cancel()
 
 	query := `SELECT * FROM comment_reactions WHERE comment_id = ?`
-	rows, err := rct.storage.QueryContext(ctx, query, commentID)
+	st, err := rct.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.QueryContext(ctx, query, commentID)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +57,7 @@ func (rct *commentReactionRepo) GetReactionsByCommentID(ctx context.Context, com
 	var reactions []entity.CommentReaction
 	for rows.Next() {
 		var reaction entity.CommentReaction
-		if err := rows.Scan(&reaction.ID, &reaction.CommentID, &reaction.UserID, &reaction.Reaction); err != nil {
+		if err = rows.Scan(&reaction.ID, &reaction.CommentID, &reaction.UserID, &reaction.Reaction); err != nil {
 			return nil, err
 		}
 
@@ -70,10 +76,16 @@ func (rct *commentReactionRepo) GetReactionByComment(ctx context.Context, userID
 	defer cancel()
 
 	query := `SELECT * FROM comment_reactions WHERE comment_id = ? AND user_id = ?`
-	row := rct.storage.QueryRowContext(ctx, query, commentID, userID)
+	st, err := rct.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.CommentReaction{}, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, commentID, userID)
 
 	var reaction entity.CommentReaction
-	if err := row.Scan(&reaction.ID, &reaction.CommentID, &reaction.UserID, &reaction.Reaction); err != nil {
+	if err = row.Scan(&reaction.ID, &reaction.CommentID, &reaction.UserID, &reaction.Reaction); err != nil {
 		return entity.CommentReaction{}, err
 	}
 

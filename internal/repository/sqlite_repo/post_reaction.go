@@ -42,7 +42,13 @@ func (rct *postReactionRepo) GetReactionsByPostID(ctx context.Context, postID ui
 	defer cancel()
 
 	query := `SELECT * FROM post_reactions WHERE post_id = ?`
-	rows, err := rct.storage.QueryContext(ctx, query, postID)
+	st, err := rct.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.QueryContext(ctx, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +57,7 @@ func (rct *postReactionRepo) GetReactionsByPostID(ctx context.Context, postID ui
 	var reactions []entity.PostReaction
 	for rows.Next() {
 		var reaction entity.PostReaction
-		if rows.Scan(&reaction.ID, &reaction.PostID, &reaction.UserID, &reaction.Reaction); err != nil {
+		if err = rows.Scan(&reaction.ID, &reaction.PostID, &reaction.UserID, &reaction.Reaction); err != nil {
 			return nil, err
 		}
 
@@ -70,10 +76,16 @@ func (rct *postReactionRepo) GetReactionByPost(ctx context.Context, userID, post
 	defer cancel()
 
 	query := `SELECT * FROM post_reactions WHERE post_id = ? AND user_id = ?`
-	row := rct.storage.QueryRowContext(ctx, query, postID, userID)
+	st, err := rct.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.PostReaction{}, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, postID, userID)
 
 	var reaction entity.PostReaction
-	if err := row.Scan(&reaction.ID, &reaction.PostID, &reaction.UserID, &reaction.Reaction); err != nil {
+	if err = row.Scan(&reaction.ID, &reaction.PostID, &reaction.UserID, &reaction.Reaction); err != nil {
 		return entity.PostReaction{}, err
 	}
 

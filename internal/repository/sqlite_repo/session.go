@@ -26,10 +26,16 @@ func (d *sessionDB) GetSession(ctx context.Context, sessionToken string) (entity
 	defer cancel()
 
 	query := `SELECT * FROM sessions WHERE session_token = ?`
-	row := d.storage.QueryRowContext(ctx, query, sessionToken)
+	st, err := d.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.Session{}, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, sessionToken)
 
 	var session entity.Session
-	if err := row.Scan(&session.ID, &session.UserID, &session.Token, &session.ExpireTime); err != nil {
+	if err = row.Scan(&session.ID, &session.UserID, &session.Token, &session.ExpireTime); err != nil {
 		return entity.Session{}, err
 	}
 

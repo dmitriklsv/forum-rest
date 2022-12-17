@@ -27,9 +27,15 @@ func (c *commentDB) CreateComment(ctx context.Context, comment entity.Comment) (
 	defer cancel()
 
 	query := `SELECT EXISTS (SELECT 1 FROM posts WHERE id = ?)`
-	row := c.storage.QueryRowContext(ctx, query, comment.PostID)
+	st, err := c.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return 0, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, comment.PostID)
 	var t int
-	if err := row.Scan(&t); err != nil {
+	if err = row.Scan(&t); err != nil {
 		return 0, err
 	}
 	if t == 0 {
@@ -37,7 +43,7 @@ func (c *commentDB) CreateComment(ctx context.Context, comment entity.Comment) (
 	}
 
 	query = `INSERT INTO comments (user_id, post_id, text) VALUES (?, ?, ?)`
-	st, err := c.storage.PrepareContext(ctx, query)
+	st, err = c.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return -1, err
 	}
@@ -56,10 +62,16 @@ func (c *commentDB) GetCommentByID(ctx context.Context, commentID uint64) (entit
 	defer cancel()
 
 	query := `SELECT * FROM comments WHERE id = ?`
-	row := c.storage.QueryRowContext(ctx, query, commentID)
+	st, err := c.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.Comment{}, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, commentID)
 
 	var comment entity.Comment
-	if err := row.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Text); err != nil {
+	if err = row.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Text); err != nil {
 		return entity.Comment{}, err
 	}
 
@@ -71,7 +83,13 @@ func (c *commentDB) GetCommentsByPostID(ctx context.Context, postID uint64) ([]e
 	defer cancel()
 
 	query := `SELECT * FROM comments WHERE post_id = ?`
-	rows, err := c.storage.QueryContext(ctx, query, postID)
+	st, err := c.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.QueryContext(ctx, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +98,7 @@ func (c *commentDB) GetCommentsByPostID(ctx context.Context, postID uint64) ([]e
 	var comments []entity.Comment
 	for rows.Next() {
 		var comment entity.Comment
-		if err := rows.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Text); err != nil {
+		if err = rows.Scan(&comment.ID, &comment.UserID, &comment.PostID, &comment.Text); err != nil {
 			return nil, err
 		}
 

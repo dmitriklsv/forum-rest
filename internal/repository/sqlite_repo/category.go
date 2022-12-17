@@ -25,18 +25,17 @@ func (c *categoryDB) CreateCategory(ctx context.Context, postID uint64, categori
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	for _, category := range categories {
-		query := `INSERT INTO categories (post_id, name) VALUES (?, ?)`
-		st, err := c.storage.PrepareContext(ctx, query)
-		if err != nil {
-			return err
-		}
-		defer st.Close()
+	query := `INSERT INTO categories (post_id, name) VALUES (?, ?)`
+	st, err := c.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return err
+	}
+	defer st.Close()
 
+	for _, category := range categories {
 		if _, err := st.ExecContext(ctx, postID, category.Name); err != nil {
 			return err
 		}
-
 	}
 
 	return nil
@@ -75,10 +74,16 @@ func (c *categoryDB) GetCategoryByID(ctx context.Context, categoryID uint64) (en
 	defer cancel()
 
 	query := `SELECT * FROM categories WHERE id = ?`
-	row := c.storage.QueryRowContext(ctx, query, categoryID)
+	st, err := c.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.Category{}, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, categoryID)
 
 	var category entity.Category
-	if err := row.Scan(&category.ID, &category.PostID, &category.Name); err != nil {
+	if err = row.Scan(&category.ID, &category.PostID, &category.Name); err != nil {
 		return entity.Category{}, err
 	}
 
@@ -90,7 +95,13 @@ func (c *categoryDB) GetCategoriesByPostID(ctx context.Context, postID uint64) (
 	defer cancel()
 
 	query := `SELECT * FROM categories WHERE post_id = ?`
-	rows, err := c.storage.QueryContext(ctx, query, postID)
+	st, err := c.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer st.Close()
+
+	rows, err := st.QueryContext(ctx, postID)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +110,7 @@ func (c *categoryDB) GetCategoriesByPostID(ctx context.Context, postID uint64) (
 	var categories []entity.Category
 	for rows.Next() {
 		var category entity.Category
-		if rows.Scan(&category.ID, &category.PostID, &category.Name); err != nil {
+		if err = rows.Scan(&category.ID, &category.PostID, &category.Name); err != nil {
 			return nil, err
 		}
 

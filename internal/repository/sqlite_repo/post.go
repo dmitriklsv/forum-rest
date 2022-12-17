@@ -73,14 +73,14 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 	var posts []entity.Post
 	for rows.Next() {
 		var post entity.Post
-		if err := rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
+		if err = rows.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
 			return nil, err
 		}
 
 		posts = append(posts, post)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
@@ -92,10 +92,16 @@ func (p *postDB) GetPostByID(ctx context.Context, postID uint64) (entity.Post, e
 	defer cancel()
 
 	query := `SELECT * FROM posts WHERE id = ?`
-	row := p.storage.QueryRowContext(ctx, query, postID)
+	st, err := p.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.Post{}, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, postID)
 
 	var post entity.Post
-	if err := row.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
+	if err = row.Scan(&post.ID, &post.UserID, &post.Title, &post.Text); err != nil {
 		return entity.Post{}, err
 	}
 

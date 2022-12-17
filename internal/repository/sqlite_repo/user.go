@@ -45,10 +45,16 @@ func (d *userDB) FindByID(ctx context.Context, id uint64) (entity.User, error) {
 	defer cancel()
 
 	query := `SELECT * FROM users WHERE id = ? `
-	row := d.storage.QueryRowContext(ctx, query, id)
+	st, err := d.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.User{}, err
+	}
+	defer st.Close()
+
+	row := st.QueryRowContext(ctx, id)
 
 	var user entity.User
-	if err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password); err != nil {
+	if err = row.Scan(&user.ID, &user.Email, &user.Username, &user.Password); err != nil {
 		return entity.User{}, err
 	}
 
@@ -59,12 +65,16 @@ func (d *userDB) FindOne(ctx context.Context, user entity.User) (entity.User, er
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
 
-	// fmt.Println(user)
 	query := `SELECT * FROM users WHERE email = ? OR (username = ? AND password = ?)`
-	row := d.storage.QueryRowContext(ctx, query, user.Email, user.Username, user.Password)
+	st, err := d.storage.PrepareContext(ctx, query)
+	if err != nil {
+		return entity.User{}, err
+	}
+	defer st.Close()
 
-	// user = entity.User{}
-	if err := row.Scan(&user.ID, &user.Email, &user.Username, &user.Password); err != nil {
+	row := st.QueryRowContext(ctx, user.Email, user.Username, user.Password)
+
+	if err = row.Scan(&user.ID, &user.Email, &user.Username, &user.Password); err != nil {
 		return entity.User{}, err
 	}
 
