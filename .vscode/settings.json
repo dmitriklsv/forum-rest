@@ -1,6 +1,28 @@
 {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-    "source.fixAll": true
+        "source.fixAll": true
+    },
+    "todo-tree.highlights.defaultHighlight": {
+        "icon": "alert",
+        "type": "text",
+        "foreground": "#fbff00",
+        "background": "#000000",
+        "opacity": 50,
+        "iconColour": "#eeff00",
+        "gutterIcon": true
+    },
+    "todo-tree.highlights.customHighlight": {
+        "TODO": {
+            "icon": "check",
+            "type": "text-and-comment"
+        },
+        "FIXME": {
+            "type": "text-and-comment",
+            "foreground": "#ff0000",
+            "background": "#000000",
+            "iconColour": "#ff0000",
+            "gutterIcon": true
+        }
     }
 }

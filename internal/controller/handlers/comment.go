@@ -33,7 +33,7 @@ func (c *commentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	comment := entity.Comment{
 		UserID: userID.(uint64),
 	}
-	// TODO: create customer
+
 	if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
 		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return

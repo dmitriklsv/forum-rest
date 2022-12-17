@@ -45,7 +45,7 @@ func (c *categoryDB) CreateCategory(ctx context.Context, postID uint64, categori
 func (c *categoryDB) GetAllCategories(ctx context.Context) ([]entity.Category, error) {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
-	// TODO: read join table
+
 	query := `SELECT * FROM categories`
 	rows, err := c.storage.QueryContext(ctx, query)
 	if err != nil {

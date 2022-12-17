@@ -9,13 +9,14 @@ import (
 	"forum/internal/controller"
 )
 
-// check rest enpoint naming standards!!!
+// TODO: CHECK REST ENDPOINT STANDARDS!!!
 const (
 	welcome = "/"
 	// auth
 	signup = "/signup"
 	signin = "/signin"
 	// post
+	// posts = "/posts"
 	createPost  = "/create_post"
 	getAllPosts = "/get_all_posts"
 	getPostByID = "/get_post_by_id"
@@ -64,6 +65,7 @@ func Run(handlers *controller.Handlers) error {
 	return ListenAndServe(router)
 }
 
+// TODO: MAKE CONFIG
 func ListenAndServe(router *http.ServeMux) error {
 	log.Println("| starting application...")
 

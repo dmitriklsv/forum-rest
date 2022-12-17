@@ -50,20 +50,22 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	gayson.SendJSON(w, postID)
 }
 
+// TODO: FILTER BY CREATED POSTS: NEWESET, OLDEST
 func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
-	// fmt.Println(len(r.URL.Query()))
 	if len(r.URL.Query()) == 1 {
 		categories := r.URL.Query()["category"]
 		if len(categories) == 0 {
 			http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 			return
 		}
-		r = r.WithContext(context.WithValue(r.Context(), "categories" /*  `"`+strings.Join(categories, `","`)+`"` */, categories))
+
+		// FIXME: CUSTOM TYPE FOR KEY
+		r = r.WithContext(context.WithValue(r.Context(), "categories", categories))
 	}
 
 	posts, err := p.service.GetAllPosts(r.Context())

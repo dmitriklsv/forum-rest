@@ -46,25 +46,27 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 	defer cancel()
 
 	query := `SELECT * FROM posts`
-	rows, err := p.storage.QueryContext(ctx, query)
+	categories := ctx.Value("categories")
+	var args []interface{}
+
+	if categories != nil {
+		for _, category := range categories.([]string) {
+			args = append(args, category)
+		}
+
+		marks := strings.Repeat(" AND post_id IN (SELECT post_id FROM categories WHERE name = ?)", len(categories.([]string)))
+		query += ` WHERE id IN (SELECT DISTINCT post_id FROM categories WHERE ` + marks[5:] + `)`
+	}
+
+	st, err := p.storage.PrepareContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
+	defer st.Close()
 
-	categories := ctx.Value("categories")
-	if categories != nil {
-		categories_len := len(categories.([]string))
-		args := make([]any, categories_len)
-		for i, category := range categories.([]string) {
-			args[i] = category
-		}
-
-		marks := strings.Repeat(" AND post_id IN (SELECT post_id FROM categories WHERE name = ?)", categories_len)
-		query += ` WHERE id IN (SELECT DISTINCT post_id FROM categories WHERE ` + marks[5:] + `)`
-		rows, err = p.storage.QueryContext(ctx, query, args...)
-		if err != nil {
-			return nil, err
-		}
+	rows, err := st.QueryContext(ctx, args...)
+	if err != nil {
+		return nil, err
 	}
 	defer rows.Close()
 
