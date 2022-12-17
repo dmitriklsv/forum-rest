@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"forum/internal/entity"
+	"forum/internal/repository/sqlite_repo"
 	"forum/pkg/sqlite3"
 )
 
@@ -23,6 +24,7 @@ type SessionRepo interface {
 type PostRepo interface {
 	CreatePost(ctx context.Context, post entity.Post) (int64, error)
 	GetAllPosts(ctx context.Context) ([]entity.Post, error)
+	// GetPostsByCategory(ctx context.Context, category string) ([]entity.Post, error)
 	GetPostByID(ctx context.Context, postID uint64) (entity.Post, error)
 }
 
@@ -36,6 +38,28 @@ type CategoryRepo interface {
 type CommentRepo interface {
 	CreateComment(ctx context.Context, comment entity.Comment) (int64, error)
 	GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error)
+	GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error)
+}
+
+type PostReactionRepo interface {
+	CreatePostReaction(ctx context.Context, reaction entity.PostReaction) error
+	GetReactionsByPostID(ctx context.Context, postID uint64) ([]entity.PostReaction, error)
+	GetReactionByPost(ctx context.Context, userID, postID uint64) (entity.PostReaction, error)
+	UpdatePostReaction(ctx context.Context, reaction entity.PostReaction) error
+	DeletePostReaction(ctx context.Context, reaction entity.PostReaction) error
+}
+
+type CommentReactionRepo interface {
+	CreateCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
+	GetReactionsByCommentID(ctx context.Context, commentID uint64) ([]entity.CommentReaction, error)
+	GetReactionByComment(ctx context.Context, userID, commentID uint64) (entity.CommentReaction, error)
+	UpdateCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
+	DeleteCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
+}
+
+type ReactionRepo struct {
+	PostReactionRepo
+	CommentReactionRepo
 }
 
 type Repositories struct {
@@ -44,14 +68,19 @@ type Repositories struct {
 	PostRepo
 	CategoryRepo
 	CommentRepo
+	ReactionRepo
 }
 
 func NewRepos(db *sqlite3.DB) *Repositories {
 	return &Repositories{
-		UserRepo:     NewUserRepo(db),
-		SessionRepo:  NewSessionRepo(db),
-		PostRepo:     NewPostRepo(db),
-		CategoryRepo: NewCategoryRepo(db),
-		CommentRepo:  NewCommentRepo(db),
+		UserRepo:     sqlite_repo.NewUserRepo(db),
+		SessionRepo:  sqlite_repo.NewSessionRepo(db),
+		PostRepo:     sqlite_repo.NewPostRepo(db),
+		CategoryRepo: sqlite_repo.NewCategoryRepo(db),
+		CommentRepo:  sqlite_repo.NewCommentRepo(db),
+		ReactionRepo: ReactionRepo{
+			sqlite_repo.NewPostReactionRepo(db),
+			sqlite_repo.NewCommentReactionRepo(db),
+		},
 	}
 }

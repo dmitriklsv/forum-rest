@@ -1,9 +1,10 @@
-package repository
+package sqlite_repo
 
 import (
 	"context"
 	"database/sql"
 	"log"
+	"strings"
 
 	"forum/internal/entity"
 	"forum/internal/tool/config"
@@ -14,7 +15,7 @@ type postDB struct {
 	storage *sql.DB
 }
 
-func NewPostRepo(database *sqlite3.DB) PostRepo {
+func NewPostRepo(database *sqlite3.DB) *postDB {
 	log.Println("| | post repository is done!")
 	return &postDB{
 		storage: database.Collection,
@@ -43,11 +44,27 @@ func (p *postDB) CreatePost(ctx context.Context, post entity.Post) (int64, error
 func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 	ctx, cancel := context.WithTimeout(ctx, config.DefaultTimeout)
 	defer cancel()
-	// TODO: read join table
+
 	query := `SELECT * FROM posts`
 	rows, err := p.storage.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
+	}
+
+	categories := ctx.Value("categories")
+	if categories != nil {
+		categories_len := len(categories.([]string))
+		args := make([]any, categories_len)
+		for i, category := range categories.([]string) {
+			args[i] = category
+		}
+
+		marks := strings.Repeat(" AND post_id IN (SELECT post_id FROM categories WHERE name = ?)", categories_len)
+		query += ` WHERE id IN (SELECT DISTINCT post_id FROM categories WHERE ` + marks[5:] + `)`
+		rows, err = p.storage.QueryContext(ctx, query, args...)
+		if err != nil {
+			return nil, err
+		}
 	}
 	defer rows.Close()
 

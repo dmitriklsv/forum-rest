@@ -1,4 +1,4 @@
-package repository
+package sqlite_repo
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type userDB struct {
 	storage *sql.DB
 }
 
-func NewUserRepo(database *sqlite3.DB) UserRepo {
+func NewUserRepo(database *sqlite3.DB) *userDB {
 	log.Println("| | user repository is done!")
 	return &userDB{
 		storage: database.Collection,

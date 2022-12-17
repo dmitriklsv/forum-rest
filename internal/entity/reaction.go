@@ -1,14 +1,15 @@
 package entity
 
-// type Reaction struct {
-// 	ID       uint64 `json:"id,omitempty"`
-// 	UserID   uint64 `json:"user_id,omitempty"`
-// 	ObjectID uint64 `json:"object_id,omitempty"`
-// 	Object   uint64 `json:"object,omitempty"`
-// 	Like     bool   `json:"like,omitempty"`
-// 	Dislike  bool   `json:"dislike,omitempty"`
-// }
+type PostReaction struct {
+	ID       uint64 `json:"id,omitempty"`
+	PostID   uint64 `json:"post_id,omitempty"`
+	UserID   uint64 `json:"user_id,omitempty"`
+	Reaction int64  `json:"reaction,omitempty"`
+}
 
-// 0- none
-// 1- post
-// 2- comment
+type CommentReaction struct {
+	ID        uint64 `json:"id,omitempty"`
+	CommentID uint64 `json:"comment_id,omitempty"`
+	UserID    uint64 `json:"user_id,omitempty"`
+	Reaction  int64  `json:"reaction,omitempty"`
+}

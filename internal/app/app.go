@@ -9,6 +9,7 @@ import (
 	"forum/internal/controller"
 )
 
+// check rest enpoint naming standards!!!
 const (
 	welcome = "/"
 	// auth
@@ -22,8 +23,12 @@ const (
 	getAllCategories = "/get_all_categories"
 	getCategoryByID  = "/get_category_by_id"
 	// comment
-	createComment  = "/create_comment"
-	getCommentByID = "/get_comment_by_id"
+	createComment       = "/create_comment"
+	getCommentsByPostID = "/get_comments_by_post_id"
+	getCommentByID      = "/get_comment_by_id"
+	// reaction
+	setPostReaction    = "/set_post_reaction"
+	setCommentReaction = "/set_comment_reaction"
 )
 
 func Run(handlers *controller.Handlers) error {
@@ -46,9 +51,14 @@ func Run(handlers *controller.Handlers) error {
 	// comment
 	router.Handle(createComment, handlers.Middleware(handlers.CreateComment))
 	router.HandleFunc(getCommentByID, handlers.GetCommentByID)
+	router.HandleFunc(getCommentsByPostID, handlers.GetCommentsByPostID)
+
+	// reaction
+	router.Handle(setPostReaction, handlers.Middleware(handlers.SetPostReaction))
+	router.Handle(setCommentReaction, handlers.Middleware(handlers.SetCommentReaction))
 
 	// home
-	router.Handle(welcome, handlers.Middleware(handlers.WelcomePage))
+	router.HandleFunc(welcome, handlers.WelcomePage)
 	// router.Handle(home, handlers.Middleware(handlers.HomePage))
 
 	return ListenAndServe(router)

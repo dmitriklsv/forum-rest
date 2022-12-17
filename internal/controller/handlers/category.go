@@ -1,20 +1,20 @@
-package controller
+package handlers
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
-	"forum/internal/entity"
 	"forum/internal/service"
-	"forum/internal/tool/errors"
+	"forum/internal/tool/customErr"
 )
 
 type categoryHandler struct {
 	service service.CategoryService
 }
 
-func NewCategoryHandler(service service.CategoryService) CategoryHandler {
+func NewCategoryHandler(service service.CategoryService) *categoryHandler {
 	log.Println("| | category handler is done!")
 	return &categoryHandler{
 		service: service,
@@ -29,12 +29,12 @@ func (c *categoryHandler) GetAllCategories(w http.ResponseWriter, r *http.Reques
 
 	categories, err := c.service.GetAllCategories(r.Context())
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(categories); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }
@@ -44,22 +44,21 @@ func (c *categoryHandler) GetCategoryByID(w http.ResponseWriter, r *http.Request
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	defer r.Body.Close()
 
-	var category entity.Category
-	if err := json.NewDecoder(r.Body).Decode(&category); err != nil {
-		http.Error(w, errors.Bruhhh, http.StatusBadRequest)
+	categoryID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
+	if err != nil {
+		http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
 		return
 	}
 
-	category, err := c.service.GetCategoryByID(r.Context(), category.ID)
+	category, err := c.service.GetCategoryByID(r.Context(), categoryID)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(category); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 }

@@ -6,6 +6,8 @@ type Post struct {
 	Title      string     `json:"title,omitempty"`
 	Text       string     `json:"text,omitempty"`
 	Categories []Category `json:"categories,omitempty"`
+	Rating     int64      `json:"rating"`
+	// Reactions  []PostReaction `json:"reactions,omitempty"`
 	// Comments   []Comment  `json:"comments,omitempty"`
 	// Likes      uint64   `json:"likes,omitempty"`
 	// Dislikes uint64   `json:"dislikes,omitempty"`

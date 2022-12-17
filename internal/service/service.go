@@ -5,6 +5,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/repository"
+	"forum/internal/service/services"
 )
 
 type Authentication interface {
@@ -29,6 +30,12 @@ type CategoryService interface {
 type CommentService interface {
 	CreateComment(ctx context.Context, comment entity.Comment) (int64, error)
 	GetCommentByID(ctx context.Context, commentID uint64) (entity.Comment, error)
+	GetCommentsByPostID(ctx context.Context, postID uint64) ([]entity.Comment, error)
+}
+
+type ReactionService interface {
+	SetPostReaction(ctx context.Context, reaction entity.PostReaction) error
+	SetCommentReaction(ctx context.Context, reaction entity.CommentReaction) error
 }
 
 type Services struct {
@@ -36,13 +43,15 @@ type Services struct {
 	PostService
 	CategoryService
 	CommentService
+	ReactionService
 }
 
 func NewServices(repository *repository.Repositories) *Services {
 	return &Services{
-		Authentication:  NewAuthService(repository.UserRepo, repository.SessionRepo),
-		PostService:     NewPostService(repository.PostRepo, repository.CategoryRepo),
-		CategoryService: NewCategoryService(repository.CategoryRepo),
-		CommentService:  NewCommentService(repository.CommentRepo),
+		Authentication:  services.NewAuthService(repository.UserRepo, repository.SessionRepo),
+		PostService:     services.NewPostService(repository.PostRepo, repository.CategoryRepo, repository.ReactionRepo),
+		CategoryService: services.NewCategoryService(repository.CategoryRepo),
+		CommentService:  services.NewCommentService(repository.CommentRepo, repository.CommentReactionRepo),
+		ReactionService: services.NewReactionService(repository.ReactionRepo),
 	}
 }

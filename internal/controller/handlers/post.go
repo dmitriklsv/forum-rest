@@ -1,20 +1,23 @@
-package controller
+package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"forum/internal/entity"
 	"forum/internal/service"
-	"forum/internal/tool/errors"
+	"forum/internal/tool/customErr"
+	"forum/pkg/gayson"
 )
 
 type postHandler struct {
 	service service.PostService
 }
 
-func NewPostHandler(service service.PostService) PostHandler {
+func NewPostHandler(service service.PostService) *postHandler {
 	log.Println("| | post handler is done!")
 	return &postHandler{
 		service: service,
@@ -34,20 +37,17 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
 	postID, err := p.service.CreatePost(r.Context(), post)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
-	if err = json.NewEncoder(w).Encode(postID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	gayson.SendJSON(w, postID)
 }
 
 func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
@@ -56,16 +56,23 @@ func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// fmt.Println(len(r.URL.Query()))
+	if len(r.URL.Query()) == 1 {
+		categories := r.URL.Query()["category"]
+		if len(categories) == 0 {
+			http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
+			return
+		}
+		r = r.WithContext(context.WithValue(r.Context(), "categories" /*  `"`+strings.Join(categories, `","`)+`"` */, categories))
+	}
+
 	posts, err := p.service.GetAllPosts(r.Context())
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(posts); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
-		return
-	}
+	gayson.SendJSON(w, posts)
 }
 
 func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
@@ -73,22 +80,18 @@ func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
-	defer r.Body.Close()
 
-	var post entity.Post
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
-		http.Error(w, errors.InvalidData, http.StatusBadRequest)
-		return
-	}
-
-	post, err := p.service.GetPostByID(r.Context(), post.ID)
+	postID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
 	if err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(post); err != nil {
-		http.Error(w, errors.InvalidContract, http.StatusInternalServerError)
+	post, err := p.service.GetPostByID(r.Context(), postID)
+	if err != nil {
+		http.Error(w, customErr.InvalidContract, http.StatusInternalServerError)
 		return
 	}
+
+	gayson.SendJSON(w, post)
 }

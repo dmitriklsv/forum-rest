@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"context"
@@ -9,15 +9,17 @@ import (
 )
 
 type postService struct {
-	postRepo repository.PostRepo
-	catRepo  repository.CategoryRepo
+	postRepo     repository.PostRepo
+	catRepo      repository.CategoryRepo
+	reactionRepo repository.PostReactionRepo
 }
 
-func NewPostService(pRepo repository.PostRepo, catRepo repository.CategoryRepo) PostService {
+func NewPostService(pRepo repository.PostRepo, catRepo repository.CategoryRepo, rctRepo repository.PostReactionRepo) *postService {
 	log.Println("| | post service is done!")
 	return &postService{
-		postRepo: pRepo,
-		catRepo:  catRepo,
+		postRepo:     pRepo,
+		catRepo:      catRepo,
+		reactionRepo: rctRepo,
 	}
 }
 
@@ -46,6 +48,10 @@ func (p *postService) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if posts[i].Rating, err = p.setRating(ctx, posts[i].ID); err != nil {
+			return nil, err
+		}
 	}
 
 	return posts, nil
@@ -62,5 +68,28 @@ func (p *postService) GetPostByID(ctx context.Context, postID uint64) (entity.Po
 		return entity.Post{}, err
 	}
 
+	if post.Rating, err = p.setRating(ctx, postID); err != nil {
+		return entity.Post{}, err
+	}
+
 	return post, nil
+}
+
+func (p *postService) setRating(ctx context.Context, postID uint64) (int64, error) {
+	reactions, err := p.reactionRepo.GetReactionsByPostID(ctx, postID)
+	if err != nil {
+		return 0, err
+	}
+
+	var rating int64
+
+	for _, reaction := range reactions {
+		if reaction.Reaction == 1 {
+			rating++
+		} else {
+			rating--
+		}
+	}
+
+	return rating, err
 }
