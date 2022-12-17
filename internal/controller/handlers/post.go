@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,10 +26,7 @@ func NewPostHandler(service service.PostService) *postHandler {
 }
 
 func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
+	fmt.Println(1)
 	defer r.Body.Close()
 
 	userID := r.Context().Value(userCtx)
@@ -47,16 +45,12 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(postID)
 	gayson.SendJSON(w, postID)
 }
 
 // TODO: FILTER BY CREATED POSTS: NEWESET, OLDEST
 func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
 	if len(r.URL.Query()) == 1 {
 		categories := r.URL.Query()["category"]
 		if len(categories) == 0 {
@@ -64,7 +58,7 @@ func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// FIXME: CUSTOM TYPE FOR KEY
+		// var cat ctx = "categories"
 		r = r.WithContext(context.WithValue(r.Context(), "categories", categories))
 	}
 
@@ -78,12 +72,7 @@ func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		return
-	}
-
-	postID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 64)
+	postID, err := strconv.ParseUint(r.Context().Value("post_ID").(string), 10, 64)
 	if err != nil {
 		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return

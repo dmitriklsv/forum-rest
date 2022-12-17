@@ -1,12 +1,15 @@
 package app
 
 import (
+	"context"
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"time"
 
 	"forum/internal/controller"
+	"forum/internal/tool/customErr"
 )
 
 // TODO: CHECK REST ENDPOINT STANDARDS!!!
@@ -16,10 +19,7 @@ const (
 	signup = "/signup"
 	signin = "/signin"
 	// post
-	// posts = "/posts"
-	createPost  = "/create_post"
-	getAllPosts = "/get_all_posts"
-	getPostByID = "/get_post_by_id"
+	posts = "/posts/"
 	// category
 	getAllCategories = "/get_all_categories"
 	getCategoryByID  = "/get_category_by_id"
@@ -41,9 +41,27 @@ func Run(handlers *controller.Handlers) error {
 	router.HandleFunc(signin, handlers.SignIn)
 
 	// post
-	router.Handle(createPost, handlers.Middleware(handlers.CreatePost))
-	router.HandleFunc(getAllPosts, handlers.GetAllPosts)
-	router.HandleFunc(getPostByID, handlers.GetPostByID)
+	router.HandleFunc(posts, func(w http.ResponseWriter, r *http.Request) {
+		// fmt.Println(r.URL.Path)
+		switch r.Method {
+		case http.MethodPost:
+			handlers.Middleware(handlers.CreatePost)(w, r)
+		case http.MethodGet:
+			reg := regexp.MustCompile(`^/posts/(\d+)$`)
+			if reg.MatchString(r.URL.String()) {
+				// var post_ID ctx = "post_ID"
+				handlers.GetPostByID(w, r.WithContext(context.WithValue(r.Context(), "post_ID", reg.FindStringSubmatch(r.URL.Path)[1])))
+			} else if len(r.URL.Query()) == 1 && r.URL.Path == "/posts/" {
+				handlers.GetAllPosts(w, r)
+			} else {
+				http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
+				return
+			}
+		default:
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+	})
 
 	// cat
 	router.HandleFunc(getAllCategories, handlers.GetAllCategories)
