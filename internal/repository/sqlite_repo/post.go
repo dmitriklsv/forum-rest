@@ -46,8 +46,21 @@ func (p *postDB) GetAllPosts(ctx context.Context) ([]entity.Post, error) {
 	defer cancel()
 
 	query := `SELECT * FROM posts`
-	categories := ctx.Value("categories")
+	userID := ctx.Value(config.UserID)
+	categories := ctx.Value(config.Categories)
 	var args []interface{}
+
+	if userID != nil {
+		args = append(args, userID)
+		switch ctx.Value(config.Filter).(string) {
+		case "own":
+			query += ` WHERE user_id = ?`
+		case "liked":
+			query += ` WHERE id IN (SELECT post_id FROM post_reactions WHERE user_id = ? AND reaction = 1)`
+		case "disliked":
+			query += ` WHERE id IN (SELECT post_id FROM post_reactions WHERE user_id = ? AND reaction = 0)`
+		}
+	}
 
 	if categories != nil {
 		for _, category := range categories.([]string) {

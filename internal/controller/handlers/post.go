@@ -3,13 +3,13 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
 	"forum/internal/entity"
 	"forum/internal/service"
+	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 	"forum/pkg/gayson"
 )
@@ -26,10 +26,9 @@ func NewPostHandler(service service.PostService) *postHandler {
 }
 
 func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(1)
 	defer r.Body.Close()
 
-	userID := r.Context().Value(userCtx)
+	userID := r.Context().Value(config.UserID)
 	post := entity.Post{
 		UserID: userID.(uint64),
 	}
@@ -45,21 +44,26 @@ func (p *postHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(postID)
 	gayson.SendJSON(w, postID)
 }
 
-// TODO: FILTER BY CREATED POSTS: NEWESET, OLDEST
 func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	if len(r.URL.Query()) == 1 {
-		categories := r.URL.Query()["category"]
-		if len(categories) == 0 {
-			http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
-			return
-		}
+		if r.URL.Query().Has("category") {
+			categories := r.URL.Query()["category"]
+			if len(categories) == 0 {
+				http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
+				return
+			}
 
-		// var cat ctx = "categories"
-		r = r.WithContext(context.WithValue(r.Context(), "categories", categories))
+			r = r.WithContext(context.WithValue(r.Context(), config.Categories, categories))
+		} else if r.URL.Query().Has("own") {
+			r = r.WithContext(context.WithValue(r.Context(), config.Filter, "own"))
+		} else if r.URL.Query().Has("liked") {
+			r = r.WithContext(context.WithValue(r.Context(), config.Filter, "liked"))
+		} else if r.URL.Query().Has("disliked") {
+			r = r.WithContext(context.WithValue(r.Context(), config.Filter, "disliked"))
+		}
 	}
 
 	posts, err := p.service.GetAllPosts(r.Context())
@@ -72,7 +76,7 @@ func (p *postHandler) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *postHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
-	postID, err := strconv.ParseUint(r.Context().Value("post_ID").(string), 10, 64)
+	postID, err := strconv.ParseUint(r.Context().Value(config.PostID).(string), 10, 64)
 	if err != nil {
 		http.Error(w, customErr.InvalidData, http.StatusBadRequest)
 		return

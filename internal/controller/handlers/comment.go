@@ -8,6 +8,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/service"
+	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 )
 
@@ -29,7 +30,7 @@ func (c *commentHandler) CreateComment(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	userID := r.Context().Value(userCtx)
+	userID := r.Context().Value(config.UserID)
 	comment := entity.Comment{
 		UserID: userID.(uint64),
 	}

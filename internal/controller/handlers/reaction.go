@@ -6,6 +6,7 @@ import (
 
 	"forum/internal/entity"
 	"forum/internal/service"
+	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 )
 
@@ -26,7 +27,7 @@ func (rct *reactionHandler) SetPostReaction(w http.ResponseWriter, r *http.Reque
 	}
 	defer r.Body.Close()
 
-	userID := r.Context().Value(userCtx)
+	userID := r.Context().Value(config.UserID)
 	reaction := entity.PostReaction{
 		UserID: userID.(uint64),
 	}
@@ -49,7 +50,7 @@ func (rct *reactionHandler) SetCommentReaction(w http.ResponseWriter, r *http.Re
 	}
 	defer r.Body.Close()
 
-	userID := r.Context().Value(userCtx)
+	userID := r.Context().Value(config.UserID)
 	reaction := entity.CommentReaction{
 		UserID: userID.(uint64),
 	}

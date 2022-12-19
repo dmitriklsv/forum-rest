@@ -2,7 +2,8 @@ html {
     overflow: hidden;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -19,7 +20,7 @@ body {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: 1fr;
     grid-column-gap: 0px;
-    grid-row-gap: 0px; 
+    grid-row-gap: 0px;
     align-items: center;
     align-content: center;
     height: 80px;
@@ -65,10 +66,10 @@ body {
     width: 90px;
     border-radius: 10px;
     cursor: pointer;
-    -webkit-user-select: none;    
+    -webkit-user-select: none;
     -moz-user-select: none;
-    -ms-user-select: none; 
-    user-select: none; 
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .back-button:hover {
@@ -85,7 +86,7 @@ body {
 
 .comments {
     padding: 24px 32px;
-    
+
 }
 
 .comment {

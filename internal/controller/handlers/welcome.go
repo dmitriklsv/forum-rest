@@ -7,15 +7,12 @@ import (
 	"net/http"
 
 	"forum/internal/service"
+	"forum/internal/tool/config"
 )
 
 type welcomeHandler struct {
 	service service.Authentication
 }
-
-type ctx string
-
-var userCtx ctx = "userCtx"
 
 func NewWelcomeHandler(service service.Authentication) *welcomeHandler {
 	log.Println("| | welcome handler is done!")
@@ -32,7 +29,7 @@ func (h *welcomeHandler) WelcomePage(w http.ResponseWriter, r *http.Request) {
 	// userId := r.Context().Value(ctx)
 	// tmpl, _ := template.ParseFiles("./template/welcome.html")
 	// tmpl.Execute(w, userId)
-	userId := r.Context().Value(userCtx)
+	userId := r.Context().Value(config.UserID)
 	json.NewEncoder(w).Encode(userId)
 	// w.Write([]byte(strconv.Itoa(userId)))
 }
@@ -66,18 +63,18 @@ func (h *welcomeHandler) Middleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		session, err = h.service.UpdateSession(r.Context(), session)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		// session, err = h.service.UpdateSession(r.Context(), session)
+		// if err != nil {
+		// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+		// 	return
+		// }
 
-		http.SetCookie(w, &http.Cookie{
-			Name:    "session_token",
-			Value:   session.Token,
-			Expires: session.ExpireTime,
-		})
+		// http.SetCookie(w, &http.Cookie{
+		// 	Name:    "session_token",
+		// 	Value:   session.Token,
+		// 	Expires: session.ExpireTime,
+		// })
 
-		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), userCtx, session.UserID)))
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), config.UserID, session.UserID)))
 	}
 }

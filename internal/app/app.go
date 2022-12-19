@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"forum/internal/controller"
+	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 )
 
@@ -21,8 +22,7 @@ const (
 	// post
 	posts = "/posts/"
 	// category
-	getAllCategories = "/get_all_categories"
-	getCategoryByID  = "/get_category_by_id"
+	categories = "/categories/"
 	// comment
 	createComment       = "/create_comment"
 	getCommentsByPostID = "/get_comments_by_post_id"
@@ -41,31 +41,10 @@ func Run(handlers *controller.Handlers) error {
 	router.HandleFunc(signin, handlers.SignIn)
 
 	// post
-	router.HandleFunc(posts, func(w http.ResponseWriter, r *http.Request) {
-		// fmt.Println(r.URL.Path)
-		switch r.Method {
-		case http.MethodPost:
-			handlers.Middleware(handlers.CreatePost)(w, r)
-		case http.MethodGet:
-			reg := regexp.MustCompile(`^/posts/(\d+)$`)
-			if reg.MatchString(r.URL.String()) {
-				// var post_ID ctx = "post_ID"
-				handlers.GetPostByID(w, r.WithContext(context.WithValue(r.Context(), "post_ID", reg.FindStringSubmatch(r.URL.Path)[1])))
-			} else if len(r.URL.Query()) == 1 && r.URL.Path == "/posts/" {
-				handlers.GetAllPosts(w, r)
-			} else {
-				http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
-				return
-			}
-		default:
-			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-			return
-		}
-	})
+	router.HandleFunc(posts, Posts(handlers))
 
 	// cat
-	router.HandleFunc(getAllCategories, handlers.GetAllCategories)
-	router.HandleFunc(getCategoryByID, handlers.GetCategoryByID)
+	router.HandleFunc(categories, Categories(handlers))
 
 	// comment
 	router.Handle(createComment, handlers.Middleware(handlers.CreateComment))
@@ -100,4 +79,52 @@ func ListenAndServe(router *http.ServeMux) error {
 
 	log.Println("| listening http://localhost:8080")
 	return server.Serve(listener)
+}
+
+func Posts(handlers *controller.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			handlers.Welcomer.Middleware(handlers.PostHandler.CreatePost)(w, r)
+		case http.MethodGet:
+			reg := regexp.MustCompile(`^/posts/(\d+)$`)
+			if reg.MatchString(r.URL.String()) {
+				handlers.PostHandler.GetPostByID(w, r.WithContext(context.WithValue(r.Context(), config.PostID, reg.FindStringSubmatch(r.URL.Path)[1])))
+			} else if len(r.URL.Query()) == 1 && r.URL.Path == "/posts/" {
+				if r.URL.Query().Has("own") || r.URL.Query().Has("liked") || r.URL.Query().Has("disliked") {
+					handlers.Welcomer.Middleware(handlers.PostHandler.GetAllPosts)(w, r)
+				} else {
+					handlers.PostHandler.GetAllPosts(w, r)
+				}
+			} else if r.URL.Path == "/posts/" {
+				handlers.PostHandler.GetAllPosts(w, r)
+			} else {
+				http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
+				return
+			}
+		default:
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+	}
+}
+
+func Categories(handlers *controller.Handlers) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			reg := regexp.MustCompile(`^/categories/(\d+)$`)
+			if reg.MatchString(r.URL.String()) {
+				handlers.CategoryHandler.GetCategoryByID(w, r.WithContext(context.WithValue(r.Context(), config.CategoryID, reg.FindStringSubmatch(r.URL.Path)[1])))
+			} else if r.URL.Path == "/categories/" {
+				handlers.CategoryHandler.GetAllCategories(w, r)
+			} else {
+				http.Error(w, customErr.Bruhhh, http.StatusBadRequest)
+				return
+			}
+		default:
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+	}
 }
