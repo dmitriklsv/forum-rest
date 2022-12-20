@@ -20,7 +20,7 @@ const (
 	signup = "/signup"
 	signin = "/signin"
 	// post
-	posts = "/posts/"
+	posts = "/posts/" 
 	// category
 	categories = "/categories/"
 	// comment

@@ -29,12 +29,6 @@ func (h *userHandler) SignIn(w http.ResponseWriter, r *http.Request) {
 	// 	tmpl.Execute(w, nil)
 	// 	return
 	case http.MethodPost:
-		// http.SetCookie(w, &http.Cookie{
-		// 	Name:    "",
-		// 	Value:   "",
-		// 	Expires: time.Unix(0, 0),
-		// })
-
 		var user entity.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
