@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"forum/internal/controller"
 	"forum/internal/entity"
-	"forum/internal/service"
 	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 )
 
 type reactionHandler struct {
-	service service.ReactionService
+	service controller.ReactionService
 }
 
-func NewReactionHandler(service service.ReactionService) *reactionHandler {
+func NewReactionHandler(service controller.ReactionService) *reactionHandler {
 	return &reactionHandler{
 		service: service,
 	}

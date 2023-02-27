@@ -6,15 +6,15 @@ import (
 	"log"
 	"net/http"
 
-	"forum/internal/service"
+	"forum/internal/controller"
 	"forum/internal/tool/config"
 )
 
 type welcomeHandler struct {
-	service service.Authentication
+	service controller.Authentication
 }
 
-func NewWelcomeHandler(service service.Authentication) *welcomeHandler {
+func NewWelcomeHandler(service controller.Authentication) *welcomeHandler {
 	log.Println("| | welcome handler is done!")
 	return &welcomeHandler{
 		service: service,

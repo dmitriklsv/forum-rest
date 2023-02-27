@@ -1,10 +1,10 @@
-package service
+package controller
 
 import (
 	"context"
 
 	"forum/internal/entity"
-	"forum/internal/repository"
+	"forum/internal/service"
 	"forum/internal/service/services"
 )
 
@@ -46,7 +46,7 @@ type Services struct {
 	ReactionService
 }
 
-func NewServices(repository *repository.Repositories) *Services {
+func NewServices(repository *service.Repositories) *Services {
 	return &Services{
 		Authentication:  services.NewAuthService(repository.UserRepo, repository.SessionRepo),
 		PostService:     services.NewPostService(repository.PostRepo, repository.CategoryRepo, repository.ReactionRepo),

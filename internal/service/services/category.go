@@ -5,14 +5,14 @@ import (
 	"log"
 
 	"forum/internal/entity"
-	"forum/internal/repository"
+	"forum/internal/service"
 )
 
 type categoryService struct {
-	catRepo repository.CategoryRepo
+	catRepo service.CategoryRepo
 }
 
-func NewCategoryService(catRepo repository.CategoryRepo) *categoryService {
+func NewCategoryService(catRepo service.CategoryRepo) *categoryService {
 	log.Println("| | category service is done!")
 	return &categoryService{
 		catRepo: catRepo,

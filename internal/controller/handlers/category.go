@@ -5,17 +5,17 @@ import (
 	"net/http"
 	"strconv"
 
-	"forum/internal/service"
+	"forum/internal/controller"
 	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 	"forum/pkg/gayson"
 )
 
 type categoryHandler struct {
-	service service.CategoryService
+	service controller.CategoryService
 }
 
-func NewCategoryHandler(service service.CategoryService) *categoryHandler {
+func NewCategoryHandler(service controller.CategoryService) *categoryHandler {
 	log.Println("| | category handler is done!")
 	return &categoryHandler{
 		service: service,

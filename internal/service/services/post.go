@@ -5,16 +5,16 @@ import (
 	"log"
 
 	"forum/internal/entity"
-	"forum/internal/repository"
+	"forum/internal/service"
 )
 
 type postService struct {
-	postRepo     repository.PostRepo
-	catRepo      repository.CategoryRepo
-	reactionRepo repository.PostReactionRepo
+	postRepo     service.PostRepo
+	catRepo      service.CategoryRepo
+	reactionRepo service.PostReactionRepo
 }
 
-func NewPostService(pRepo repository.PostRepo, catRepo repository.CategoryRepo, rctRepo repository.PostReactionRepo) *postService {
+func NewPostService(pRepo service.PostRepo, catRepo service.CategoryRepo, rctRepo service.PostReactionRepo) *postService {
 	log.Println("| | post service is done!")
 	return &postService{
 		postRepo:     pRepo,

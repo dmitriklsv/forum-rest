@@ -5,15 +5,15 @@ import (
 	"log"
 
 	"forum/internal/entity"
-	"forum/internal/repository"
+	"forum/internal/service"
 )
 
 type commentService struct {
-	commentRepo  repository.CommentRepo
-	reactionRepo repository.CommentReactionRepo // make set reaction for comments
+	commentRepo  service.CommentRepo
+	reactionRepo service.CommentReactionRepo // make set reaction for comments
 }
 
-func NewCommentService(cRepo repository.CommentRepo, reactionRepo repository.CommentReactionRepo) *commentService {
+func NewCommentService(cRepo service.CommentRepo, reactionRepo service.CommentReactionRepo) *commentService {
 	log.Println("| | comment service is done!")
 	return &commentService{
 		commentRepo:  cRepo,

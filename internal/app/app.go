@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"time"
 
-	"forum/internal/controller"
 	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 )
@@ -20,7 +19,7 @@ const (
 	signup = "/signup"
 	signin = "/signin"
 	// post
-	posts = "/posts/" 
+	posts = "/posts/"
 	// category
 	categories = "/categories/"
 	// comment
@@ -32,7 +31,7 @@ const (
 	setCommentReaction = "/set_comment_reaction"
 )
 
-func Run(handlers *controller.Handlers) error {
+func Run(handlers *Handlers) error {
 	log.Println("| creating router...")
 	router := http.NewServeMux()
 
@@ -57,13 +56,7 @@ func Run(handlers *controller.Handlers) error {
 
 	// home
 	router.HandleFunc(welcome, handlers.WelcomePage)
-	// router.Handle(home, handlers.Middleware(handlers.HomePage))
-
-	return ListenAndServe(router)
-}
-
-// TODO: MAKE CONFIG
-func ListenAndServe(router *http.ServeMux) error {
+	// router.Handle(home, handlers.MiddleErroCheck error {
 	log.Println("| starting application...")
 
 	listener, err := net.Listen("tcp", ":8080")
@@ -81,7 +74,7 @@ func ListenAndServe(router *http.ServeMux) error {
 	return server.Serve(listener)
 }
 
-func Posts(handlers *controller.Handlers) http.HandlerFunc {
+func Posts(handlers *Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
@@ -109,7 +102,7 @@ func Posts(handlers *controller.Handlers) http.HandlerFunc {
 	}
 }
 
-func Categories(handlers *controller.Handlers) http.HandlerFunc {
+func Categories(handlers *Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
