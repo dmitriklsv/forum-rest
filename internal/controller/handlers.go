@@ -1,10 +1,10 @@
-package app
+package controller
 
 import (
 	"net/http"
 
-	"forum/internal/controller"
 	"forum/internal/controller/handlers"
+	"forum/internal/service"
 )
 
 type Welcomer interface {
@@ -50,7 +50,7 @@ type Handlers struct {
 	ReactionHandler
 }
 
-func NewHandlers(services *controller.Services) *Handlers {
+func NewHandlers(services *service.Services) *Handlers {
 	return &Handlers{
 		Welcomer:        handlers.NewWelcomeHandler(services.Authentication),
 		UserHandler:     handlers.NewUserHandler(services.Authentication),

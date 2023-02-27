@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"time"
 
+	"forum/internal/controller"
 	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 )
@@ -31,7 +32,7 @@ const (
 	setCommentReaction = "/set_comment_reaction"
 )
 
-func Run(handlers *Handlers) error {
+func Run(handlers *controller.Handlers) error {
 	log.Println("| creating router...")
 	router := http.NewServeMux()
 
@@ -74,7 +75,7 @@ func Run(handlers *Handlers) error {
 	return server.Serve(listener)
 }
 
-func Posts(handlers *Handlers) http.HandlerFunc {
+func Posts(handlers *controller.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
@@ -102,7 +103,7 @@ func Posts(handlers *Handlers) http.HandlerFunc {
 	}
 }
 
-func Categories(handlers *Handlers) http.HandlerFunc {
+func Categories(handlers *controller.Handlers) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:

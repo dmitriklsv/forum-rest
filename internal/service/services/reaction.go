@@ -7,14 +7,14 @@ import (
 	"fmt"
 
 	"forum/internal/entity"
-	"forum/internal/service"
+	"forum/internal/repository"
 )
 
 type reactionService struct {
-	reactionRepo service.ReactionRepo
+	reactionRepo repository.ReactionRepo
 }
 
-func NewReactionService(curReactionRepo service.ReactionRepo) *reactionService {
+func NewReactionService(curReactionRepo repository.ReactionRepo) *reactionService {
 	return &reactionService{
 		reactionRepo: curReactionRepo,
 	}

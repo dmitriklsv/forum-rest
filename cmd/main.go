@@ -6,6 +6,7 @@ import (
 
 	"forum/internal/app"
 	"forum/internal/controller"
+	"forum/internal/repository"
 	"forum/internal/service"
 	"forum/pkg/sqlite3"
 )
@@ -21,15 +22,15 @@ func main() {
 	defer db.Collection.Close()
 
 	log.Println("| constructing repositories...")
-	repos := service.NewRepos(db)
+	repos := repository.NewRepos(db)
 	log.Println("| repositories are ready to work!")
 
 	log.Println("| constructing services...")
-	services := controller.NewServices(repos)
+	services := service.NewServices(repos)
 	log.Println("| services are ready to work!")
 
 	log.Println("| constructing handlers...")
-	handlers := app.NewHandlers(services)
+	handlers := controller.NewHandlers(services)
 	log.Println("| handlers are ready to work!")
 
 	if err := app.Run(handlers); err != nil {

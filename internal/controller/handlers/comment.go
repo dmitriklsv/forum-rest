@@ -6,17 +6,17 @@ import (
 	"net/http"
 	"strconv"
 
-	"forum/internal/controller"
 	"forum/internal/entity"
+	"forum/internal/service"
 	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 )
 
 type commentHandler struct {
-	service controller.CommentService
+	service service.CommentService
 }
 
-func NewCommentHandler(service controller.CommentService) *commentHandler {
+func NewCommentHandler(service service.CommentService) *commentHandler {
 	log.Println("| | comment handler is done!")
 	return &commentHandler{
 		service: service,

@@ -5,15 +5,15 @@ import (
 	"log"
 	"net/http"
 
-	"forum/internal/controller"
 	"forum/internal/entity"
+	"forum/internal/service"
 )
 
 type userHandler struct {
-	service controller.Authentication
+	service service.Authentication
 }
 
-func NewUserHandler(service controller.Authentication) *userHandler {
+func NewUserHandler(service service.Authentication) *userHandler {
 	log.Println("| | user handler is done!")
 	return &userHandler{
 		service: service,

@@ -7,18 +7,18 @@ import (
 	"net/http"
 	"strconv"
 
-	"forum/internal/controller"
 	"forum/internal/entity"
+	"forum/internal/service"
 	"forum/internal/tool/config"
 	"forum/internal/tool/customErr"
 	"forum/pkg/gayson"
 )
 
 type postHandler struct {
-	service controller.PostService
+	service service.PostService
 }
 
-func NewPostHandler(service controller.PostService) *postHandler {
+func NewPostHandler(service service.PostService) *postHandler {
 	log.Println("| | post handler is done!")
 	return &postHandler{
 		service: service,

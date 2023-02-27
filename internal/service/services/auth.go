@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"forum/internal/entity"
-	"forum/internal/service"
+	"forum/internal/repository"
 
 	"github.com/gofrs/uuid"
 )
@@ -16,11 +16,11 @@ import (
 const salt = "9j0oigjio3t8kllmcvblj31"
 
 type authService struct {
-	userRepo    service.UserRepo
-	sessionRepo service.SessionRepo
+	userRepo    repository.UserRepo
+	sessionRepo repository.SessionRepo
 }
 
-func NewAuthService(uRepo service.UserRepo, sRepo service.SessionRepo) *authService {
+func NewAuthService(uRepo repository.UserRepo, sRepo repository.SessionRepo) *authService {
 	log.Println("| | authentication service is done!")
 	return &authService{
 		userRepo:    uRepo,
